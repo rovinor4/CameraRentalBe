@@ -1,0 +1,43 @@
+2026-05-17T23:33:07.637+07:00  INFO 61336 --- [CameraRentalBe] [main] c.r.c.CameraRentalBeApplicationTests     : Starting CameraRentalBeApplicationTests using Java 25.0.2 with PID 61336 (started by rovinoramadhani in /Users/rovinoramadhani/Project/CameraRentalBE/CameraRentalBe)
+2026-05-17T23:33:07.640+07:00  INFO 61336 --- [CameraRentalBe] [main] c.r.c.CameraRentalBeApplicationTests     : No active profile set, falling back to 1 default profile: "default"
+2026-05-17T23:33:07.894+07:00  INFO 61336 --- [CameraRentalBe] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-17T23:33:07.903+07:00  INFO 61336 --- [CameraRentalBe] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 5 ms. Found 0 JPA repository interfaces.
+2026-05-17T23:33:08.145+07:00  INFO 61336 --- [CameraRentalBe] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-17T23:33:08.295+07:00  INFO 61336 --- [CameraRentalBe] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@68f776ee
+2026-05-17T23:33:08.296+07:00  INFO 61336 --- [CameraRentalBe] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-17T23:33:08.313+07:00  INFO 61336 --- [CameraRentalBe] [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:mysql://localhost:3306/rvinproject_camera_rental (MySQL 12.2)
+2026-05-17T23:33:08.319+07:00  WARN 61336 --- [CameraRentalBe] [main] o.f.c.internal.database.base.Database    : Using MariaDB 12.2 which is newer than the version Flyway has been verified with. The latest verified version of MariaDB is 11.7.
+2026-05-17T23:33:08.336+07:00  INFO 61336 --- [CameraRentalBe] [main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.012s)
+2026-05-17T23:33:08.344+07:00  INFO 61336 --- [CameraRentalBe] [main] o.f.core.internal.command.DbMigrate      : Current version of schema `rvinproject_camera_rental`: 1
+2026-05-17T23:33:08.346+07:00  INFO 61336 --- [CameraRentalBe] [main] o.f.core.internal.command.DbMigrate      : Schema `rvinproject_camera_rental` is up to date. No migration necessary.
+2026-05-17T23:33:08.385+07:00  INFO 61336 --- [CameraRentalBe] [main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-05-17T23:33:08.409+07:00  INFO 61336 --- [CameraRentalBe] [main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-05-17T23:33:08.567+07:00  INFO 61336 --- [CameraRentalBe] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-17T23:33:08.589+07:00  WARN 61336 --- [CameraRentalBe] [main] org.hibernate.orm.jdbc                   : HHH100045: Could not obtain connection metadata: java.sql.SQLSyntaxErrorException: Unknown column 'RESERVED' in 'WHERE'
+2026-05-17T23:33:08.596+07:00  WARN 61336 --- [CameraRentalBe] [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-17T23:33:08.600+07:00  INFO 61336 --- [CameraRentalBe] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: MySQLDialect
+	Database version: 8.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: NONE [default NONE]
+	JDBC fetch size: undefined/unknown
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-05-17T23:33:08.948+07:00  INFO 61336 --- [CameraRentalBe] [main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-17T23:33:09.226+07:00  INFO 61336 --- [CameraRentalBe] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-17T23:33:09.262+07:00  WARN 61336 --- [CameraRentalBe] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-17T23:33:09.389+07:00  WARN 61336 --- [CameraRentalBe] [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: e0c8de87-87d3-4f1f-af96-8779f0ec03b5
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-05-17T23:33:09.407+07:00  INFO 61336 --- [CameraRentalBe] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-05-17T23:33:09.490+07:00  INFO 61336 --- [CameraRentalBe] [main] c.r.c.CameraRentalBeApplicationTests     : Started CameraRentalBeApplicationTests in 1.999 seconds (process running for 2.426)
+2026-05-17T23:33:09.735+07:00  INFO 61336 --- [CameraRentalBe] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-17T23:33:09.735+07:00  INFO 61336 --- [CameraRentalBe] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-17T23:33:09.738+07:00  INFO 61336 --- [CameraRentalBe] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

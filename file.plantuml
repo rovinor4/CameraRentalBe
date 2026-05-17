@@ -1,0 +1,333 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+enum ItemStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+}
+
+enum RentalStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  LATE
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum FineType {
+  LATE
+  DAMAGE
+  LOST
+}
+
+enum PaymentOption {
+  FULL
+  DP
+}
+
+enum PricingScheme {
+  DAILY
+  WEEKLY
+  MONTHLY
+  PACKAGE
+}
+
+abstract class RentalItem {
+  -itemId: String
+  -name: String
+  -brand: String
+  -dailyRate: double
+  -stock: int
+  -availableStock: int
+  -status: ItemStatus
+
+  +getItemId(): String
+  +getName(): String
+  +getBrand(): String
+  +getDailyRate(): double
+  +getStock(): int
+  +getAvailableStock(): int
+  +getStatus(): ItemStatus
+  +setName(name: String): void
+  +setBrand(brand: String): void
+  +setDailyRate(rate: double): void
+  +setStatus(status: ItemStatus): void
+  +addStock(qty: int): void
+  +reserveStock(qty: int): boolean
+  +releaseStock(qty: int): void
+  +isAvailable(qty: int): boolean
+  +calculateRentalCost(days: int, qty: int): double
+  +getItemType(): String
+
+  -reduceAvailableStock(qty: int): void
+  -increaseAvailableStock(qty: int): void
+}
+
+class Camera {
+  -cameraType: String
+  -resolution: String
+  -sensorType: String
+  -videoSupport: boolean
+
+  +getCameraType(): String
+  +getResolution(): String
+  +getSensorType(): String
+  +isVideoSupport(): boolean
+  +setCameraType(cameraType: String): void
+  +setResolution(resolution: String): void
+  +setSensorType(sensorType: String): void
+  +setVideoSupport(videoSupport: boolean): void
+  +getItemType(): String
+}
+
+class Lens {
+  -focalLength: String
+  -aperture: String
+  -mountType: String
+
+  +getFocalLength(): String
+  +getAperture(): String
+  +getMountType(): String
+  +setFocalLength(focalLength: String): void
+  +setAperture(aperture: String): void
+  +setMountType(mountType: String): void
+  +getItemType(): String
+}
+
+class Accessory {
+  -category: String
+  -description: String
+
+  +getCategory(): String
+  +getDescription(): String
+  +setCategory(category: String): void
+  +setDescription(description: String): void
+  +getItemType(): String
+}
+
+class Customer {
+  -customerId: String
+  -fullName: String
+  -phoneNumber: String
+  -address: String
+  -identityNumber: String
+  -memberStatus: boolean
+
+  +getCustomerId(): String
+  +getFullName(): String
+  +getPhoneNumber(): String
+  +getAddress(): String
+  +getIdentityNumber(): String
+  +isMemberStatus(): boolean
+  +setFullName(name: String): void
+  +setPhoneNumber(phone: String): void
+  +setAddress(address: String): void
+  +setMemberStatus(status: boolean): void
+}
+
+class Admin {
+  -adminId: String
+  -username: String
+  -password: String
+  -fullName: String
+
+  +getAdminId(): String
+  +getUsername(): String
+  +getFullName(): String
+  +login(username: String, password: String): boolean
+  +logout(): void
+  +createRental(customer: Customer, startDate: Date, dueDate: Date, paymentOption: PaymentOption, pricingScheme: PricingScheme): RentalTransaction
+  +addItem(item: RentalItem): void
+  +updateItem(item: RentalItem): void
+  +deleteItem(itemId: String): void
+  +processReturn(transaction: RentalTransaction, returnDate: Date): ReturnTransaction
+  +addPaymentMethod(method: PaymentMethod): void
+  +updatePaymentMethod(method: PaymentMethod): void
+  +deactivatePaymentMethod(methodId: String): void
+}
+
+class RentalTransaction {
+  -transactionId: String
+  -rentalDate: Date
+  -startDate: Date
+  -dueDate: Date
+  -status: RentalStatus
+  -paymentOption: PaymentOption
+  -pricingScheme: PricingScheme
+  -billedDays: int
+  -actualUsedDays: int
+  -customer: Customer
+  -admin: Admin
+  -details: List<RentalDetail>
+  -payments: List<Payment>
+  -returnTransaction: ReturnTransaction
+
+  +getTransactionId(): String
+  +getRentalDate(): Date
+  +getStartDate(): Date
+  +getDueDate(): Date
+  +getStatus(): RentalStatus
+  +getPaymentOption(): PaymentOption
+  +getPricingScheme(): PricingScheme
+  +getCustomer(): Customer
+  +getAdmin(): Admin
+  +getDetails(): List<RentalDetail>
+  +getPayments(): List<Payment>
+  +getReturnTransaction(): ReturnTransaction
+
+  +addDetail(detail: RentalDetail): void
+  +removeDetail(detailId: String): void
+  +addPayment(payment: Payment): void
+  +setReturnTransaction(returnTransaction: ReturnTransaction): void
+  +calculateTotal(): double
+  +calculateRemainingPayment(): double
+  +getRentalDuration(): int
+  +confirmTransaction(): void
+  +markAsReturned(): void
+  +isFullyPaid(): boolean
+  +getTransactionSummary(): String
+
+  -calculateBilledDays(): int
+  -calculateActualUsedDays(): int
+  -calculateBaseRentalCost(): double
+  -calculateSubtotal(): double
+  -calculatePaidAmount(): double
+}
+
+class RentalDetail {
+  -detailId: String
+  -quantity: int
+  -pricePerDay: double
+  -days: int
+  -item: RentalItem
+
+  +getDetailId(): String
+  +getQuantity(): int
+  +getPricePerDay(): double
+  +getDays(): int
+  +getItem(): RentalItem
+  +calculateCost(): double
+}
+
+class PaymentMethod {
+  -methodId: String
+  -methodName: String
+  -provider: String
+  -isActive: boolean
+
+  +getMethodId(): String
+  +getMethodName(): String
+  +getProvider(): String
+  +isActive(): boolean
+  +activate(): void
+  +deactivate(): void
+}
+
+class Payment {
+  -paymentId: String
+  -paymentDate: Date
+  -amount: double
+  -paymentStatus: PaymentStatus
+  -rentalTransaction: RentalTransaction
+  -paymentMethod: PaymentMethod
+  -fine: Fine
+
+  +getPaymentId(): String
+  +getPaymentDate(): Date
+  +getAmount(): double
+  +getPaymentStatus(): PaymentStatus
+  +getRentalTransaction(): RentalTransaction
+  +getPaymentMethod(): PaymentMethod
+  +getFine(): Fine
+  +processPayment(amount: double): boolean
+  +refund(): void
+
+  -validatePayment(): boolean
+  -markAsSuccess(): void
+  -markAsFailed(): void
+}
+
+interface FineCalculable {
+  +calculateFine(): double
+}
+
+class Fine {
+  -fineId: String
+  -fineType: FineType
+  -amount: double
+  -description: String
+  -returnTransaction: ReturnTransaction
+  -payments: List<Payment>
+
+  +getFineId(): String
+  +getFineType(): FineType
+  +getAmount(): double
+  +getDescription(): String
+  +getReturnTransaction(): ReturnTransaction
+  +getPayments(): List<Payment>
+  +addPayment(payment: Payment): void
+  +calculatePaidAmount(): double
+  +calculateRemainingFine(): double
+  +isFullyPaid(): boolean
+  +calculateFine(): double
+}
+
+class ReturnTransaction {
+  -returnId: String
+  -returnDate: Date
+  -itemCondition: String
+  -notes: String
+  -lateDays: int
+  -remainingPayment: double
+  -rentalTransaction: RentalTransaction
+  -fines: List<Fine>
+  -admin: Admin 
+
+  +getReturnId(): String
+  +getReturnDate(): Date
+  +getItemCondition(): String
+  +getNotes(): String
+  +getLateDays(): int
+  +getRemainingPayment(): double
+  +getRentalTransaction(): RentalTransaction
+  +getFines(): List<Fine>
+  +processReturn(): void
+  +addFine(fine: Fine): void
+  +calculateTotalFine(): double
+  +calculateRemainingPayment(): double
+  +isRentalFullyPaid(): boolean
+
+  -calculateLateDays(): int
+}
+
+RentalItem <|-- Camera
+RentalItem <|-- Lens
+RentalItem <|-- Accessory
+FineCalculable <|.. Fine
+
+Customer ||--o{ RentalTransaction : makes
+Admin ||--o{ RentalTransaction : manages
+Admin ||--o{ RentalItem : manages
+Admin ||--o{ PaymentMethod : configures
+Admin ||--o{ ReturnTransaction : admin_id
+
+RentalTransaction ||--|{ RentalDetail : contains
+RentalDetail }|--|| RentalItem : item
+
+RentalTransaction ||--o{ Payment : has
+Payment }|--|| PaymentMethod : uses
+
+RentalTransaction ||--o| ReturnTransaction : return
+ReturnTransaction ||--o{ Fine : has
+Fine ||--o{ Payment : paid by
+
+@enduml
