@@ -1,0 +1,378 @@
+@startuml
+title Camera Rental BE Architecture
+
+left to right direction
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 10
+skinparam shadowing false
+skinparam nodesep 10
+skinparam ranksep 100
+
+package "Controller" {
+  class CameraRentalBeApplication <<Application>>
+  class AppController <<Controller>>
+  class AuthController <<Controller>>
+  class AdminController <<Controller>>
+  class CustomerController <<Controller>>
+  class CategoryController <<Controller>>
+  class CategoryDetailController <<Controller>>
+  class ItemController <<Controller>>
+  class PaymentMethodController <<Controller>>
+  class RentalController <<Controller>>
+  class RentalPaymentController <<Controller>>
+  class RentalReturnController <<Controller>>
+  class PenaltyController <<Controller>>
+  class ItemMaintenanceController <<Controller>>
+  class ReportController <<Controller>>
+}
+
+package "Config & Middleware" {
+  class SecurityConfig <<Config>>
+  class AuthMiddleware <<Middleware>>
+  class GlobalExceptionHandler <<Advice>>
+}
+
+package "DTO Request" {
+  class LoginRequest <<DTO>>
+  class AdminRequest <<DTO>>
+  class CustomerRequest <<DTO>>
+  class CategoryRequest <<DTO>>
+  class CategoryDetailRequest <<DTO>>
+  class ItemRequest <<DTO>>
+  class PaymentMethodRequest <<DTO>>
+  class RentalRequest <<DTO>>
+  class RentalDetailRequest <<DTO>>
+  class RentalPaymentRequest <<DTO>>
+  class ReturnRequest <<DTO>>
+  class PenaltyRequest <<DTO>>
+  class MaintenanceRequest <<DTO>>
+}
+
+package "Service" {
+  class AdminAuthService <<Service>>
+  class CustomerService <<Service>>
+  class CategoryService <<Service>>
+  class CategoryDetailService <<Service>>
+  class ItemService <<Service>>
+  class PaymentMethodService <<Service>>
+  class RentalService <<Service>>
+  class RentalPaymentService <<Service>>
+  class RentalReturnService <<Service>>
+  class PenaltyService <<Service>>
+  class ItemMaintenanceService <<Service>>
+  class ReportService <<Service>>
+}
+
+package "Repository" {
+  interface AdminRepository <<Repository>>
+  interface AdminSessionRepository <<Repository>>
+  interface CustomerRepository <<Repository>>
+  interface CategoryRepository <<Repository>>
+  interface CategoryDetailRepository <<Repository>>
+  interface ItemRepository <<Repository>>
+  interface PaymentMethodRepository <<Repository>>
+  interface RentalRepository <<Repository>>
+  interface RentalDetailRepository <<Repository>>
+  interface RentalPaymentRepository <<Repository>>
+  interface RentalReturnRepository <<Repository>>
+  interface PenaltyRepository <<Repository>>
+  interface ItemMaintenanceRepository <<Repository>>
+}
+
+package "Model" {
+  class Admin <<Entity>> {
+    id
+    name
+    email
+    password
+    role: AdminRole
+  }
+  class AdminSession <<Entity>> {
+    id
+    token
+    expiresAt
+  }
+  class Customer <<Entity>> {
+    id
+    name
+    phone
+    identityType: IdentityType
+  }
+  class Category <<Entity>> {
+    id
+    name
+  }
+  class CategoryDetail <<Entity>> {
+    id
+    name
+  }
+  class Item <<Entity>> {
+    id
+    name
+    dailyPrice
+    stock
+    status: ItemStatus
+  }
+  class PaymentMethod <<Entity>> {
+    id
+    name
+    type: PaymentMethodType
+    contentType: PaymentContentType
+    active
+  }
+  class Rental <<Entity>> {
+    id
+    rentalCode
+    rentalDate
+    plannedReturnDate
+    totalPrice
+    status: RentalStatus
+  }
+  class RentalDetail <<Entity>> {
+    id
+    dailyPrice
+    quantity
+    subtotal
+  }
+  class RentalPayment <<Entity>> {
+    id
+    paymentCode
+    amount
+    paymentDate
+    status: PaymentStatus
+  }
+  class RentalReturn <<Entity>> {
+    id
+    returnDate
+    hasPenalty
+  }
+  class Penalty <<Entity>> {
+    id
+    penaltyType: PenaltyType
+    amount
+    status: PenaltyStatus
+  }
+  class ItemMaintenance <<Entity>> {
+    id
+    title
+    maintenanceDate
+    cost
+    status: MaintenanceStatus
+  }
+}
+
+package "Enum Model" {
+  enum AdminRole {
+    super_admin
+    admin
+  }
+  enum IdentityType {
+    id_card
+    driver_license
+  }
+  enum ItemStatus {
+    available
+    rented
+    maintenance
+    inactive
+  }
+  enum PaymentMethodType {
+    qr_code
+    bank_transfer
+    cash
+    e_wallet
+  }
+  enum PaymentContentType {
+    image
+    text
+  }
+  enum RentalStatus {
+    pending
+    ongoing
+    returned
+    cancelled
+  }
+  enum PaymentStatus {
+    pending
+    paid
+    failed
+  }
+  enum PenaltyType {
+    late_return
+    damage
+    lost_item
+    other
+  }
+  enum PenaltyStatus {
+    unpaid
+    paid
+  }
+  enum MaintenanceStatus {
+    in_progress
+    completed
+  }
+}
+
+package "Util" {
+  class AuthUtil <<Utility>>
+  class PageUtil <<Utility>>
+  class PageableUtil <<Utility>>
+  class QueryUtil <<Utility>>
+  class ValidationUtil <<Utility>>
+  class JSONFormat <<Helper>>
+  class StringHelper <<Helper>>
+}
+
+CameraRentalBeApplication --> SecurityConfig
+CameraRentalBeApplication --> AuthMiddleware
+GlobalExceptionHandler --> JSONFormat
+AuthMiddleware --> AdminSessionRepository
+AuthMiddleware --> Admin
+SecurityConfig --> AuthMiddleware
+
+AuthController --> LoginRequest
+AuthController --> AdminAuthService
+AuthController --> JSONFormat
+AdminController --> AdminRequest
+AdminController --> AdminAuthService
+AdminController --> JSONFormat
+CustomerController --> CustomerRequest
+CustomerController --> CustomerService
+CustomerController --> JSONFormat
+CategoryController --> CategoryRequest
+CategoryController --> CategoryService
+CategoryController --> JSONFormat
+CategoryDetailController --> CategoryDetailRequest
+CategoryDetailController --> CategoryDetailService
+CategoryDetailController --> JSONFormat
+ItemController --> ItemRequest
+ItemController --> ItemService
+ItemController --> JSONFormat
+PaymentMethodController --> PaymentMethodRequest
+PaymentMethodController --> PaymentMethodService
+PaymentMethodController --> JSONFormat
+RentalController --> RentalRequest
+RentalController --> RentalService
+RentalController --> JSONFormat
+RentalPaymentController --> RentalPaymentRequest
+RentalPaymentController --> RentalPaymentService
+RentalPaymentController --> JSONFormat
+RentalReturnController --> ReturnRequest
+RentalReturnController --> RentalReturnService
+RentalReturnController --> JSONFormat
+PenaltyController --> PenaltyRequest
+PenaltyController --> PenaltyService
+PenaltyController --> JSONFormat
+ItemMaintenanceController --> MaintenanceRequest
+ItemMaintenanceController --> ItemMaintenanceService
+ItemMaintenanceController --> JSONFormat
+ReportController --> ReportService
+ReportController --> JSONFormat
+
+AdminAuthService --> AdminRepository
+AdminAuthService --> AdminSessionRepository
+AdminAuthService --> StringHelper
+CustomerService --> CustomerRepository
+CategoryService --> CategoryRepository
+CategoryDetailService --> CategoryDetailRepository
+CategoryDetailService --> CategoryService
+ItemService --> ItemRepository
+ItemService --> CategoryService
+ItemService --> CategoryDetailService
+PaymentMethodService --> PaymentMethodRepository
+RentalService --> RentalRepository
+RentalService --> CustomerRepository
+RentalService --> ItemRepository
+RentalService --> StringHelper
+RentalPaymentService --> RentalPaymentRepository
+RentalPaymentService --> RentalService
+RentalPaymentService --> PaymentMethodService
+RentalPaymentService --> StringHelper
+RentalReturnService --> RentalReturnRepository
+RentalReturnService --> RentalService
+RentalReturnService --> PaymentMethodService
+PenaltyService --> PenaltyRepository
+PenaltyService --> RentalReturnService
+ItemMaintenanceService --> ItemMaintenanceRepository
+ItemMaintenanceService --> ItemService
+ReportService --> RentalRepository
+ReportService --> PenaltyRepository
+ReportService --> CustomerRepository
+ReportService --> ItemRepository
+ReportService --> RentalPaymentRepository
+
+AdminRepository --> Admin
+AdminSessionRepository --> AdminSession
+CustomerRepository --> Customer
+CategoryRepository --> Category
+CategoryDetailRepository --> CategoryDetail
+ItemRepository --> Item
+PaymentMethodRepository --> PaymentMethod
+RentalRepository --> Rental
+RentalDetailRepository --> RentalDetail
+RentalPaymentRepository --> RentalPayment
+RentalReturnRepository --> RentalReturn
+PenaltyRepository --> Penalty
+ItemMaintenanceRepository --> ItemMaintenance
+
+Admin "1" -- "0..*" AdminSession
+Category "1" -- "0..*" CategoryDetail
+Category "1" -- "0..*" Item
+CategoryDetail "0..1" -- "0..*" Item
+Customer "1" -- "0..*" Rental
+Admin "1" -- "0..*" Rental
+Rental "1" -- "1..*" RentalDetail
+Item "1" -- "0..*" RentalDetail
+Rental "1" -- "0..*" RentalPayment
+PaymentMethod "1" -- "0..*" RentalPayment
+Rental "1" -- "0..1" RentalReturn
+Admin "1" -- "0..*" RentalReturn
+PaymentMethod "0..1" -- "0..*" RentalReturn
+RentalReturn "1" -- "0..*" Penalty
+Item "1" -- "0..*" ItemMaintenance
+Admin "1" -- "0..*" ItemMaintenance
+
+Admin --> AdminRole
+Customer --> IdentityType
+Item --> ItemStatus
+PaymentMethod --> PaymentMethodType
+PaymentMethod --> PaymentContentType
+Rental --> RentalStatus
+RentalPayment --> PaymentStatus
+Penalty --> PenaltyType
+Penalty --> PenaltyStatus
+ItemMaintenance --> MaintenanceStatus
+
+RentalRequest "1" -- "1..*" RentalDetailRequest
+AdminController --> AuthUtil
+CustomerController --> AuthUtil
+CategoryController --> AuthUtil
+CategoryDetailController --> AuthUtil
+ItemController --> AuthUtil
+PaymentMethodController --> AuthUtil
+RentalController --> AuthUtil
+RentalReturnController --> AuthUtil
+ItemMaintenanceController --> AuthUtil
+
+AdminController --> PageableUtil
+CustomerController --> PageableUtil
+CategoryController --> PageableUtil
+CategoryDetailController --> PageableUtil
+ItemController --> PageableUtil
+PaymentMethodController --> PageableUtil
+RentalController --> PageableUtil
+RentalPaymentController --> PageableUtil
+RentalReturnController --> PageableUtil
+PenaltyController --> PageableUtil
+ItemMaintenanceController --> PageableUtil
+
+AdminAuthService --> ValidationUtil
+CustomerService --> ValidationUtil
+ItemService --> ValidationUtil
+PaymentMethodService --> ValidationUtil
+RentalService --> ValidationUtil
+RentalPaymentService --> ValidationUtil
+PenaltyService --> ValidationUtil
+ItemMaintenanceService --> ValidationUtil
+@enduml

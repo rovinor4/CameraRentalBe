@@ -1,5 +1,6 @@
 package com.rvinproject.camerarentalbe.app.util;
 
+import com.rvinproject.camerarentalbe.app.enumModel.AdminRole;
 import com.rvinproject.camerarentalbe.app.model.Admin;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class AuthUtil {
     }
 
     public static void requireSuperAdmin(Admin admin) {
-        if (!"super_admin".equals(admin.getRole())) {
+        if (!AdminRole.super_admin.equals(admin.getRole())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Akses ditolak");
         }
     }

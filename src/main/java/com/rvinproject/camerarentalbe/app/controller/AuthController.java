@@ -1,6 +1,6 @@
 package com.rvinproject.camerarentalbe.app.controller;
 
-import com.rvinproject.camerarentalbe.app.dto.ApiRequest;
+import com.rvinproject.camerarentalbe.app.dto.request.LoginRequest;
 import com.rvinproject.camerarentalbe.app.service.AdminAuthService;
 import com.rvinproject.camerarentalbe.helper.JSONFormat;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +16,7 @@ public class AuthController {
     private final AdminAuthService adminAuthService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody ApiRequest.Login request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         return ResponseEntity.ok(JSONFormat.success(adminAuthService.login(request, httpRequest), "Login berhasil"));
     }
 

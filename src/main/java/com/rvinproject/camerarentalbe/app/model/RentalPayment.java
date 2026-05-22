@@ -1,5 +1,6 @@
 package com.rvinproject.camerarentalbe.app.model;
 
+import com.rvinproject.camerarentalbe.app.enumModel.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,8 @@ public class RentalPayment {
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
     @Column(name = "proof_image")
     private String proofImage;
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)

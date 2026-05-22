@@ -1,6 +1,8 @@
 package com.rvinproject.camerarentalbe.app.service;
 
-import com.rvinproject.camerarentalbe.app.dto.ApiRequest;
+import com.rvinproject.camerarentalbe.app.dto.request.AdminRequest;
+import com.rvinproject.camerarentalbe.app.dto.request.LoginRequest;
+import com.rvinproject.camerarentalbe.app.enumModel.AdminRole;
 import com.rvinproject.camerarentalbe.app.model.Admin;
 import com.rvinproject.camerarentalbe.app.model.AdminSession;
 import com.rvinproject.camerarentalbe.app.repository.AdminRepository;
@@ -20,20 +22,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AdminAuthService {
-    private static final Set<String> ADMIN_ROLES = Set.of("super_admin", "admin");
-
     private final AdminRepository adminRepository;
     private final AdminSessionRepository adminSessionRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public Map<String, Object> login(ApiRequest.Login request, HttpServletRequest httpRequest) {
+    public Map<String, Object> login(LoginRequest request, HttpServletRequest httpRequest) {
         Admin admin = adminRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email / Password salah"));
         if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
@@ -69,8 +67,7 @@ public class AdminAuthService {
         return adminResponse(admin(id));
     }
 
-    public Map<String, Object> createAdmin(ApiRequest.AdminRequest request) {
-        ValidationUtil.oneOf(request.getRole(), ADMIN_ROLES, "role");
+    public Map<String, Object> createAdmin(AdminRequest request) {
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "password wajib diisi");
         }
@@ -83,8 +80,7 @@ public class AdminAuthService {
         return adminResponse(adminRepository.save(admin));
     }
 
-    public Map<String, Object> updateAdmin(Long id, ApiRequest.AdminRequest request) {
-        ValidationUtil.oneOf(request.getRole(), ADMIN_ROLES, "role");
+    public Map<String, Object> updateAdmin(Long id, AdminRequest request) {
         Admin admin = admin(id);
         if (!admin.getEmail().equals(request.getEmail()) && adminRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email sudah digunakan");
@@ -100,10 +96,10 @@ public class AdminAuthService {
         adminRepository.delete(admin(id));
     }
 
-    private void apply(Admin admin, ApiRequest.AdminRequest request) {
+    private void apply(Admin admin, AdminRequest request) {
         admin.setName(request.getName());
         admin.setEmail(request.getEmail());
-        admin.setRole(request.getRole());
+        admin.setRole(ValidationUtil.enumValue(request.getRole(), AdminRole.class, "role"));
     }
 
     public Admin admin(Long id) {

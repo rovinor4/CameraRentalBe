@@ -1,5 +1,6 @@
 package com.rvinproject.camerarentalbe.app.model;
 
+import com.rvinproject.camerarentalbe.app.enumModel.MaintenanceStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,8 @@ public class ItemMaintenance {
     @Column(nullable = false)
     private BigDecimal cost;
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private MaintenanceStatus status;
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at", insertable = false, updatable = false)

@@ -1,6 +1,7 @@
 package com.rvinproject.camerarentalbe.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.rvinproject.camerarentalbe.app.enumModel.AdminRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +28,8 @@ public class Admin {
     private String password;
 
     @Column(nullable = false, length = 50)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private AdminRole role;
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;

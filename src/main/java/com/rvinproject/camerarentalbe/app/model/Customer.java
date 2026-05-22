@@ -1,5 +1,6 @@
 package com.rvinproject.camerarentalbe.app.model;
 
+import com.rvinproject.camerarentalbe.app.enumModel.IdentityType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,8 @@ public class Customer {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String address;
     @Column(name = "identity_type", nullable = false)
-    private String identityType;
+    @Enumerated(EnumType.STRING)
+    private IdentityType identityType;
     @Column(name = "identity_number", nullable = false, unique = true)
     private String identityNumber;
     @Column(name = "identity_image")

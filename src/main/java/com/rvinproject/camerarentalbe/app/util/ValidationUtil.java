@@ -15,6 +15,17 @@ public class ValidationUtil {
         }
     }
 
+    public static <E extends Enum<E>> E enumValue(String value, Class<E> enumClass, String field) {
+        if (value == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, field + " tidak valid");
+        }
+        try {
+            return Enum.valueOf(enumClass, value);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, field + " tidak valid");
+        }
+    }
+
     public static void validId(Long id, String field) {
         if (id == null || id <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, field + " tidak valid");

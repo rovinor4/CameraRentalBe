@@ -1,18 +1,16 @@
 package com.rvinproject.camerarentalbe.app.controller;
 
-import com.rvinproject.camerarentalbe.app.dto.ApiRequest;
+import com.rvinproject.camerarentalbe.app.dto.request.AdminRequest;
 import com.rvinproject.camerarentalbe.app.model.Admin;
 import com.rvinproject.camerarentalbe.app.service.AdminAuthService;
 import com.rvinproject.camerarentalbe.app.util.AuthUtil;
 import com.rvinproject.camerarentalbe.app.util.PageUtil;
+import com.rvinproject.camerarentalbe.app.util.PageableUtil;
 import com.rvinproject.camerarentalbe.app.util.QueryUtil;
 import com.rvinproject.camerarentalbe.helper.JSONFormat;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +33,7 @@ public class AdminController {
         Map<String, String[]> params = request.getParameterMap();
         return ResponseEntity.ok(JSONFormat.success(PageUtil.response(adminAuthService.allAdmins(
                 QueryUtil.dateTimeSpecification(params, ADMIN_SEARCH_FIELDS, "createdAt"),
-                pageable(page, size, params)
+                PageableUtil.from(page, size, params)
         )), "Berhasil mengambil admin"));
     }
 
@@ -46,13 +44,13 @@ public class AdminController {
     }
 
     @PostMapping
-    public ResponseEntity<?> store(@Valid @RequestBody ApiRequest.AdminRequest body, HttpServletRequest request) {
+    public ResponseEntity<?> store(@Valid @RequestBody AdminRequest body, HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
         return ResponseEntity.ok(JSONFormat.success(adminAuthService.createAdmin(body), "Berhasil membuat admin"));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody ApiRequest.AdminRequest body, HttpServletRequest request) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody AdminRequest body, HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
         return ResponseEntity.ok(JSONFormat.success(adminAuthService.updateAdmin(id, body), "Berhasil mengubah admin"));
     }
@@ -64,8 +62,4 @@ public class AdminController {
         return ResponseEntity.ok(JSONFormat.success(null, "Berhasil menghapus admin"));
     }
 
-    private Pageable pageable(int page, int size, Map<String, String[]> params) {
-        Sort.Direction direction = "asc".equalsIgnoreCase(QueryUtil.direction(params)) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        return PageRequest.of(Math.max(page, 0), Math.max(1, Math.min(size, 100)), Sort.by(direction, QueryUtil.sortField(params)));
-    }
 }

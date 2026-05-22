@@ -1,5 +1,6 @@
 package com.rvinproject.camerarentalbe.app.model;
 
+import com.rvinproject.camerarentalbe.app.enumModel.ItemStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,8 @@ public class Item {
     @Column(nullable = false)
     private Integer stock;
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ItemStatus status;
     private String image;
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;

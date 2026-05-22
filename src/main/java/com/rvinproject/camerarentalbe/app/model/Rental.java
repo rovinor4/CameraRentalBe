@@ -1,5 +1,6 @@
 package com.rvinproject.camerarentalbe.app.model;
 
+import com.rvinproject.camerarentalbe.app.enumModel.RentalStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +36,8 @@ public class Rental {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private RentalStatus status;
     @Column(columnDefinition = "TEXT")
     private String note;
     @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)

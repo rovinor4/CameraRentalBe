@@ -1,5 +1,7 @@
 package com.rvinproject.camerarentalbe.app.model;
 
+import com.rvinproject.camerarentalbe.app.enumModel.PaymentContentType;
+import com.rvinproject.camerarentalbe.app.enumModel.PaymentMethodType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,9 +19,11 @@ public class PaymentMethod {
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethodType type;
     @Column(name = "content_type", nullable = false)
-    private String contentType;
+    @Enumerated(EnumType.STRING)
+    private PaymentContentType contentType;
     @Column(name = "content_value", columnDefinition = "TEXT")
     private String contentValue;
     @Column(name = "is_active", nullable = false)
