@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:8080
+
+### Login super admin
+# @name loginSuperAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### Login admin biasa
+# @name loginAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rental@camera-rental.test",
+  "password": "admin123"
+}
+
+### Report rentals CSV
+GET {{baseUrl}}/api/reports/rentals.csv?startDate=2026-05-01&endDate=2026-05-31
+Authorization: Bearer {{loginAdmin.response.body.data.token}}
+
+### Report returns CSV
+GET {{baseUrl}}/api/reports/returns.csv?startDate=2026-05-01&endDate=2026-05-31
+Authorization: Bearer {{loginAdmin.response.body.data.token}}
+
+### Report denda CSV
+GET {{baseUrl}}/api/reports/denda.csv?startDate=2026-05-01&endDate=2026-05-31
+Authorization: Bearer {{loginAdmin.response.body.data.token}}
+
+### Report customers CSV
+GET {{baseUrl}}/api/reports/customers.csv
+Authorization: Bearer {{loginAdmin.response.body.data.token}}
+
+### Report items CSV - super admin only
+GET {{baseUrl}}/api/reports/items.csv
+Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+
+### Report payments CSV - super admin only
+GET {{baseUrl}}/api/reports/payments.csv?startDate=2026-05-01&endDate=2026-05-31
+Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+

@@ -1,0 +1,193 @@
+@startuml
+title Camera Rental Management Database
+
+entity admins {
+  * id : bigint
+  --
+  name : varchar
+  email : varchar
+  password : varchar
+  role : enum(super_admin, admin)
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity admin_sessions {
+  * id : bigint
+  --
+  admin_id : bigint
+  token : varchar
+  ip_address : varchar
+  user_agent : text
+  expires_at : timestamp
+  created_at : timestamp
+}
+
+entity customers {
+  * id : bigint
+  --
+  name : varchar
+  phone : varchar
+  address : text
+  identity_type : enum(id_card, driver_license)
+  identity_number : varchar
+  identity_image : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity categories {
+  * id : bigint
+  --
+  name : varchar
+  description : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity category_details {
+  * id : bigint
+  --
+  category_id : bigint
+  name : varchar
+  description : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity items {
+  * id : bigint
+  --
+  category_id : bigint
+  category_detail_id : bigint
+  name : varchar
+  brand : varchar
+  model : varchar
+  serial_number : varchar
+  description : text
+  daily_price : decimal
+  stock : int
+  status : enum(available, rented, maintenance, inactive)
+  image : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity payment_methods {
+  * id : bigint
+  --
+  name : varchar
+  type : enum(qr_code, bank_transfer, cash, e_wallet)
+  content_type : enum(image, text)
+  content_value : text
+  is_active : boolean
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity rentals {
+  * id : bigint
+  --
+  customer_id : bigint
+  admin_id : bigint
+  rental_code : varchar
+  rental_date : date
+  planned_return_date : date
+  actual_return_date : date
+  total_price : decimal
+  status : enum(pending, ongoing, returned, cancelled)
+  note : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity rental_details {
+  * id : bigint
+  --
+  rental_id : bigint
+  item_id : bigint
+  daily_price : decimal
+  quantity : int
+  subtotal : decimal
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity rental_payments {
+  * id : bigint
+  --
+  rental_id : bigint
+  payment_method_id : bigint
+  payment_code : varchar
+  amount : decimal
+  payment_date : timestamp
+  status : enum(pending, paid, failed)
+  proof_image : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity returns {
+  * id : bigint
+  --
+  rental_id : bigint
+  admin_id : bigint
+  return_date : date
+  condition_note : text
+  has_penalty : boolean
+  penalty_payment_method_id : bigint
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity penalties {
+  * id : bigint
+  --
+  return_id : bigint
+  penalty_type : enum(late_return, damage, lost_item, other)
+  description : text
+  amount : decimal
+  status : enum(unpaid, paid)
+  paid_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity item_maintenance {
+  * id : bigint
+  --
+  item_id : bigint
+  admin_id : bigint
+  title : varchar
+  description : text
+  maintenance_date : date
+  cost : decimal
+  status : enum(in_progress, completed)
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+admins ||--o{ admin_sessions : has
+admins ||--o{ rentals : processes
+admins ||--o{ returns : receives
+admins ||--o{ item_maintenance : records
+
+customers ||--o{ rentals : makes
+
+categories ||--o{ category_details : has
+categories ||--o{ items : groups
+category_details ||--o{ items : classifies
+
+rentals ||--o{ rental_details : has
+items ||--o{ rental_details : rented_in
+
+rentals ||--o{ rental_payments : paid_by
+payment_methods ||--o{ rental_payments : used_by
+
+rentals ||--o| returns : returned_as
+returns ||--o| penalties : has
+payment_methods ||--o{ returns : used_for_penalty
+
+items ||--o{ item_maintenance : maintained_in
+
+@enduml

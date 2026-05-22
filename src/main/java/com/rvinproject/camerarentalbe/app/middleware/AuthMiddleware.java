@@ -1,7 +1,7 @@
 package com.rvinproject.camerarentalbe.app.middleware;
 
-import com.rvinproject.camerarentalbe.app.model.Token;
-import com.rvinproject.camerarentalbe.app.repository.TokenRepository;
+import com.rvinproject.camerarentalbe.app.model.AdminSession;
+import com.rvinproject.camerarentalbe.app.repository.AdminSessionRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class AuthMiddleware extends OncePerRequestFilter {
-    private final TokenRepository tokenRepository;
+    private final AdminSessionRepository adminSessionRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -38,28 +38,28 @@ public class AuthMiddleware extends OncePerRequestFilter {
         }
 
         String tokenValue = authorization.substring(7);
-        Optional<Token> tokenOptional = tokenRepository.findByToken(tokenValue);
+        Optional<AdminSession> tokenOptional = adminSessionRepository.findByToken(tokenValue);
 
         if (tokenOptional.isEmpty()) {
             unauthorized(response);
             return;
         }
 
-        Token token = tokenOptional.get();
+        AdminSession token = tokenOptional.get();
 
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             unauthorized(response);
             return;
         }
 
-        request.setAttribute("auth_user", token.getUser());
+        request.setAttribute("auth_admin", token.getAdmin());
         filterChain.doFilter(request, response);
     }
 
     private boolean isPublicPath(String path) {
         return path.equals("/")
                 || path.equals("/api/auth/login")
-                || path.equals("/api/auth/register");
+                || path.equals("/api/health");
     }
 
     private void unauthorized(HttpServletResponse response) throws IOException {

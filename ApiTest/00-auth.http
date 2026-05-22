@@ -1,0 +1,33 @@
+@baseUrl = http://localhost:8080
+@superAdminEmail = admin@camera-rental.test
+@adminEmail = rental@camera-rental.test
+@password = admin123
+
+### Login super admin
+# @name loginSuperAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{superAdminEmail}}",
+  "password": "{{password}}"
+}
+
+### Login admin biasa
+# @name loginAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{password}}"
+}
+
+### App info
+GET {{baseUrl}}/api
+Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+
+### Logout super admin
+DELETE {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+
