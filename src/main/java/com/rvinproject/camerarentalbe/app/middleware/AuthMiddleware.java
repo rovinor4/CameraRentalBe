@@ -23,9 +23,9 @@ public class AuthMiddleware extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getServletPath();
+        String path = request.getRequestURI();
 
-        if (isPublicPath(path)) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod()) || isPublicPath(path)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -38,7 +38,7 @@ public class AuthMiddleware extends OncePerRequestFilter {
         }
 
         String tokenValue = authorization.substring(7);
-        Optional<AdminSession> tokenOptional = adminSessionRepository.findByToken(tokenValue);
+        Optional<AdminSession> tokenOptional = adminSessionRepository.findByTokenWithAdmin(tokenValue);
 
         if (tokenOptional.isEmpty()) {
             unauthorized(response);
@@ -59,7 +59,8 @@ public class AuthMiddleware extends OncePerRequestFilter {
     private boolean isPublicPath(String path) {
         return path.equals("/")
                 || path.equals("/api/auth/login")
-                || path.equals("/api/health");
+                || path.equals("/api/health")
+                || path.startsWith("/storage/");
     }
 
     private void unauthorized(HttpServletResponse response) throws IOException {

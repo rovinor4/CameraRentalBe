@@ -1,0 +1,82 @@
+@baseUrl = http://localhost:8080
+
+### Login admin biasa
+# @name login_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rental@camera-rental.test",
+  "password": "admin123"
+}
+
+### List rental payments
+GET {{baseUrl}}/api/rental-payments?page=0&size=10&search=PAY&status=paid&start_date=2026-05-01&end_date=2026-05-31
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Detail rental payment
+GET {{baseUrl}}/api/rental-payments/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Create rental payment
+POST {{baseUrl}}/api/rental-payments
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: multipart/form-data; boundary=RentalPaymentCreateBoundary
+
+--RentalPaymentCreateBoundary
+Content-Disposition: form-data; name="rental_id"
+
+1
+--RentalPaymentCreateBoundary
+Content-Disposition: form-data; name="payment_method_id"
+
+1
+--RentalPaymentCreateBoundary
+Content-Disposition: form-data; name="amount"
+
+350000
+--RentalPaymentCreateBoundary
+Content-Disposition: form-data; name="payment_date"
+
+2026-05-22T13:30:00
+--RentalPaymentCreateBoundary
+Content-Disposition: form-data; name="status"
+
+paid
+--RentalPaymentCreateBoundary
+Content-Disposition: form-data; name="proof_image"; filename="proof.jpg"
+Content-Type: image/jpeg
+
+< ./files/proof.jpg
+--RentalPaymentCreateBoundary--
+
+### Update rental payment tanpa upload baru, proof_image lama tetap dipakai
+PUT {{baseUrl}}/api/rental-payments/2
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: multipart/form-data; boundary=RentalPaymentUpdateBoundary
+
+--RentalPaymentUpdateBoundary
+Content-Disposition: form-data; name="rental_id"
+
+1
+--RentalPaymentUpdateBoundary
+Content-Disposition: form-data; name="payment_method_id"
+
+1
+--RentalPaymentUpdateBoundary
+Content-Disposition: form-data; name="amount"
+
+350000
+--RentalPaymentUpdateBoundary
+Content-Disposition: form-data; name="payment_date"
+
+2026-05-22T14:00:00
+--RentalPaymentUpdateBoundary
+Content-Disposition: form-data; name="status"
+
+paid
+--RentalPaymentUpdateBoundary--
+
+### Delete rental payment
+DELETE {{baseUrl}}/api/rental-payments/4
+Authorization: Bearer {{login_admin.response.body.data.token}}

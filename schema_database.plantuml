@@ -7,7 +7,7 @@ entity admins {
   name : varchar
   email : varchar
   password : varchar
-  role : enum(super_admin, admin)
+  role : varchar
   created_at : timestamp
   updated_at : timestamp
 }
@@ -29,7 +29,7 @@ entity customers {
   name : varchar
   phone : varchar
   address : text
-  identity_type : enum(id_card, driver_license)
+  identity_type : varchar
   identity_number : varchar
   identity_image : varchar
   created_at : timestamp
@@ -67,7 +67,7 @@ entity items {
   description : text
   daily_price : decimal
   stock : int
-  status : enum(available, rented, maintenance, inactive)
+  status : varchar
   image : varchar
   created_at : timestamp
   updated_at : timestamp
@@ -77,9 +77,10 @@ entity payment_methods {
   * id : bigint
   --
   name : varchar
-  type : enum(qr_code, bank_transfer, cash, e_wallet)
-  content_type : enum(image, text)
+  type : varchar
+  content_type : varchar
   content_value : text
+  image_upload : varchar
   is_active : boolean
   created_at : timestamp
   updated_at : timestamp
@@ -95,7 +96,7 @@ entity rentals {
   planned_return_date : date
   actual_return_date : date
   total_price : decimal
-  status : enum(pending, ongoing, returned, cancelled)
+  status : varchar
   note : text
   created_at : timestamp
   updated_at : timestamp
@@ -121,7 +122,7 @@ entity rental_payments {
   payment_code : varchar
   amount : decimal
   payment_date : timestamp
-  status : enum(pending, paid, failed)
+  status : varchar
   proof_image : varchar
   created_at : timestamp
   updated_at : timestamp
@@ -144,10 +145,10 @@ entity penalties {
   * id : bigint
   --
   return_id : bigint
-  penalty_type : enum(late_return, damage, lost_item, other)
+  penalty_type : varchar
   description : text
   amount : decimal
-  status : enum(unpaid, paid)
+  status : varchar
   paid_at : timestamp
   created_at : timestamp
   updated_at : timestamp
@@ -162,7 +163,7 @@ entity item_maintenance {
   description : text
   maintenance_date : date
   cost : decimal
-  status : enum(in_progress, completed)
+  status : varchar
   created_at : timestamp
   updated_at : timestamp
 }

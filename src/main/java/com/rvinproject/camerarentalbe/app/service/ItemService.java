@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -19,6 +20,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final CategoryService categoryService;
     private final CategoryDetailService categoryDetailService;
+    private final FileStorageService fileStorageService;
 
     public Page<Item> items(Specification<Item> specification, Pageable pageable) {
         return itemRepository.findAll(specification, pageable);
@@ -30,6 +32,7 @@ public class ItemService {
 
     public Item saveItem(Long id, ItemRequest request) {
         Item item = id == null ? new Item() : item(id);
+        String oldImage = item.getImage();
         item.setCategory(categoryService.category(request.getCategoryId()));
         item.setCategoryDetail(request.getCategoryDetailId() == null ? null : categoryDetailService.categoryDetail(request.getCategoryDetailId()));
         item.setName(request.getName());
@@ -40,12 +43,26 @@ public class ItemService {
         item.setDailyPrice(request.getDailyPrice());
         item.setStock(request.getStock());
         item.setStatus(ValidationUtil.enumValue(request.getStatus(), ItemStatus.class, "status"));
-        item.setImage(request.getImage());
-        return itemRepository.save(item);
+        String uploadedImage = fileStorageService.storeImage(request.getImageUpload(), "public");
+        if (uploadedImage == null && id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "image_upload wajib diisi");
+        }
+        if (uploadedImage != null) {
+            item.setImage(uploadedImage);
+        } else if (!StringUtils.hasText(item.getImage())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "image_upload wajib diisi");
+        }
+        Item savedItem = itemRepository.save(item);
+        if (uploadedImage != null) {
+            fileStorageService.deleteStoredFile(oldImage);
+        }
+        return savedItem;
     }
 
     public void deleteItem(Long id) {
-        itemRepository.delete(item(id));
+        Item item = item(id);
+        itemRepository.delete(item);
+        fileStorageService.deleteStoredFile(item.getImage());
     }
 
     private ResponseStatusException notFound(String label) {

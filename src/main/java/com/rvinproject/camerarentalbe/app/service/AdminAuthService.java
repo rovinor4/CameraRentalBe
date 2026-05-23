@@ -113,8 +113,8 @@ public class AdminAuthService {
         data.put("name", admin.getName());
         data.put("email", admin.getEmail());
         data.put("role", admin.getRole());
-        data.put("createdAt", admin.getCreatedAt());
-        data.put("updatedAt", admin.getUpdatedAt());
+        data.put("created_at", admin.getCreatedAt());
+        data.put("updated_at", admin.getUpdatedAt());
         return data;
     }
 }

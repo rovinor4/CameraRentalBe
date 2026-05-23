@@ -1,0 +1,81 @@
+@baseUrl = http://localhost:8080
+@token = {{login_super_admin.response.body.data.token}}
+
+### Login super admin
+# @name login_super_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### List payment methods
+GET {{baseUrl}}/api/payment-methods?page=0&size=10&content_type=text
+Authorization: Bearer {{token}}
+
+### Detail payment method
+GET {{baseUrl}}/api/payment-methods/1
+Authorization: Bearer {{token}}
+
+### Create text payment method
+POST {{baseUrl}}/api/payment-methods
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Mandiri",
+  "type": "bank_transfer",
+  "content_type": "text",
+  "content_value": "Mandiri 9876543210 a.n Camera Rental",
+  "active": true
+}
+
+### Create image payment method
+POST {{baseUrl}}/api/payment-methods
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=PaymentCreateBoundary
+
+--PaymentCreateBoundary
+Content-Disposition: form-data; name="name"
+
+QRIS Outlet
+--PaymentCreateBoundary
+Content-Disposition: form-data; name="type"
+
+qr_code
+--PaymentCreateBoundary
+Content-Disposition: form-data; name="content_type"
+
+image
+--PaymentCreateBoundary
+Content-Disposition: form-data; name="active"
+
+true
+--PaymentCreateBoundary
+Content-Disposition: form-data; name="image_upload"; filename="qris.png"
+Content-Type: image/png
+
+< ./files/qris.png
+--PaymentCreateBoundary--
+
+### Update text payment method
+PUT {{baseUrl}}/api/payment-methods/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Cash",
+  "type": "cash",
+  "content_type": "text",
+  "content_value": "Bayar tunai di kasir",
+  "active": true
+}
+
+### Delete payment method
+DELETE {{baseUrl}}/api/payment-methods/5
+Authorization: Bearer {{token}}
+
+### Access uploaded payment method image
+GET {{baseUrl}}/storage/payment-methods/filename.png

@@ -9,9 +9,13 @@ import com.rvinproject.camerarentalbe.helper.JSONFormat;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -37,13 +41,36 @@ public class RentalPaymentController {
         return ResponseEntity.ok(JSONFormat.success(service.rentalPayment(id), "Berhasil mengambil rental payment"));
     }
 
-    @PostMapping("/api/rental-payments")
+    @PostMapping(value = "/api/rental-payments", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createRentalPayment(@Valid @RequestBody RentalPaymentRequest body) {
         return ResponseEntity.ok(JSONFormat.success(service.saveRentalPayment(null, body), "Berhasil membuat rental payment"));
     }
 
-    @PutMapping("/api/rental-payments/{id}")
+    @PostMapping(value = "/api/rental-payments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createRentalPaymentMultipart(@RequestParam("rental_id") Long rentalId,
+                                                          @RequestParam("payment_method_id") Long paymentMethodId,
+                                                          @RequestParam("amount") BigDecimal amount,
+                                                          @RequestParam(value = "payment_date", required = false) LocalDateTime paymentDate,
+                                                          @RequestParam("status") String status,
+                                                          @RequestParam(value = "proof_image", required = false) MultipartFile proofImage) {
+        RentalPaymentRequest body = rentalPaymentRequest(rentalId, paymentMethodId, amount, paymentDate, status, proofImage);
+        return ResponseEntity.ok(JSONFormat.success(service.saveRentalPayment(null, body), "Berhasil membuat rental payment"));
+    }
+
+    @PutMapping(value = "/api/rental-payments/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateRentalPayment(@PathVariable Long id, @Valid @RequestBody RentalPaymentRequest body) {
+        return ResponseEntity.ok(JSONFormat.success(service.saveRentalPayment(id, body), "Berhasil mengubah rental payment"));
+    }
+
+    @PutMapping(value = "/api/rental-payments/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateRentalPaymentMultipart(@PathVariable Long id,
+                                                          @RequestParam("rental_id") Long rentalId,
+                                                          @RequestParam("payment_method_id") Long paymentMethodId,
+                                                          @RequestParam("amount") BigDecimal amount,
+                                                          @RequestParam(value = "payment_date", required = false) LocalDateTime paymentDate,
+                                                          @RequestParam("status") String status,
+                                                          @RequestParam(value = "proof_image", required = false) MultipartFile proofImage) {
+        RentalPaymentRequest body = rentalPaymentRequest(rentalId, paymentMethodId, amount, paymentDate, status, proofImage);
         return ResponseEntity.ok(JSONFormat.success(service.saveRentalPayment(id, body), "Berhasil mengubah rental payment"));
     }
 
@@ -51,5 +78,17 @@ public class RentalPaymentController {
     public ResponseEntity<?> deleteRentalPayment(@PathVariable Long id) {
         service.deleteRentalPayment(id);
         return ResponseEntity.ok(JSONFormat.success(null, "Berhasil menghapus rental payment"));
+    }
+
+    private RentalPaymentRequest rentalPaymentRequest(Long rentalId, Long paymentMethodId, BigDecimal amount,
+                                                      LocalDateTime paymentDate, String status, MultipartFile proofImage) {
+        RentalPaymentRequest request = new RentalPaymentRequest();
+        request.setRentalId(rentalId);
+        request.setPaymentMethodId(paymentMethodId);
+        request.setAmount(amount);
+        request.setPaymentDate(paymentDate);
+        request.setStatus(status);
+        request.setProofImageUpload(proofImage);
+        return request;
     }
 }

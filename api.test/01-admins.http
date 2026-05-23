@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:8080
 
 ### Login super admin
-# @name loginSuperAdmin
+# @name login_super_admin
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
@@ -12,27 +12,27 @@ Content-Type: application/json
 
 ### Get admins with pagination
 GET {{baseUrl}}/api/admins?page=0&size=10
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
 ### Search admins
 GET {{baseUrl}}/api/admins?page=0&size=10&search=rental
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
 ### Filter admins
 GET {{baseUrl}}/api/admins?page=0&size=10&role=admin&sort=name&direction=asc
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
 ### Date filter admins
-GET {{baseUrl}}/api/admins?page=0&size=10&startDate=2026-01-01&endDate=2026-12-31
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+GET {{baseUrl}}/api/admins?page=0&size=10&start_date=2026-01-01&end_date=2026-12-31
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
 ### Get admin by id
 GET {{baseUrl}}/api/admins/1
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
 ### Create admin
 POST {{baseUrl}}/api/admins
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 Content-Type: application/json
 
 {
@@ -44,7 +44,7 @@ Content-Type: application/json
 
 ### Update admin
 PUT {{baseUrl}}/api/admins/2
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 Content-Type: application/json
 
 {
@@ -56,5 +56,5 @@ Content-Type: application/json
 
 ### Delete admin
 DELETE {{baseUrl}}/api/admins/3
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
 

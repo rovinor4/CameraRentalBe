@@ -1,11 +1,13 @@
 package com.rvinproject.camerarentalbe.app.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -30,4 +32,17 @@ public class ItemRequest {
     @NotBlank
     private String status;
     private String image;
+    @JsonIgnore
+    private MultipartFile imageUpload;
+
+    @JsonIgnore
+    public MultipartFile getImageUpload() {
+        return imageUpload;
+    }
+
+    @JsonIgnore
+    public void setImageUpload(MultipartFile imageUpload) {
+        this.imageUpload = imageUpload;
+    }
+
 }

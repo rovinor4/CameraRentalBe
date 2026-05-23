@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:8080
 
 ### Login super admin
-# @name loginSuperAdmin
+# @name login_super_admin
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
@@ -11,7 +11,7 @@ Content-Type: application/json
 }
 
 ### Login admin biasa
-# @name loginAdmin
+# @name login_admin
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
@@ -22,4 +22,4 @@ Content-Type: application/json
 
 ### Logout super admin
 DELETE {{baseUrl}}/api/auth/logout
-Authorization: Bearer {{loginSuperAdmin.response.body.data.token}}
+Authorization: Bearer {{login_super_admin.response.body.data.token}}

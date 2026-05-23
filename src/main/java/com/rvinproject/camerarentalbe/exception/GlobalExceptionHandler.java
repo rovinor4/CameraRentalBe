@@ -1,6 +1,7 @@
 package com.rvinproject.camerarentalbe.exception;
 
 import com.rvinproject.camerarentalbe.helper.JSONFormat;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<?> handleMethodNotAllowed() {
@@ -23,7 +25,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleValidation(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+                .forEach(error -> errors.put(snakeCase(error.getField()), error.getDefaultMessage()));
         return ResponseEntity.badRequest().body(JSONFormat.error(errors, "Validasi gagal"));
     }
 
@@ -35,7 +37,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception exception) {
+        log.error("Unhandled exception", exception);
         return ResponseEntity.internalServerError()
                 .body(JSONFormat.error(null, "Terjadi kesalahan server"));
+    }
+
+    private String snakeCase(String value) {
+        StringBuilder result = new StringBuilder();
+        for (char character : value.toCharArray()) {
+            if (Character.isUpperCase(character)) {
+                result.append('_').append(Character.toLowerCase(character));
+            } else {
+                result.append(character);
+            }
+        }
+        return result.toString();
     }
 }

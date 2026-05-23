@@ -10,7 +10,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 public class QueryUtil {
-    private static final Set<String> RESERVED_PARAMS = Set.of("page", "size", "sort", "direction", "search", "startDate", "endDate", "dateField");
+    private static final Set<String> RESERVED_PARAMS = Set.of("page", "size", "sort", "direction", "search", "startDate", "endDate", "dateField", "start_date", "end_date", "date_field");
 
     private QueryUtil() {
     }
@@ -30,20 +30,20 @@ public class QueryUtil {
             }
 
             for (Map.Entry<String, String[]> entry : params.entrySet()) {
-                String key = entry.getKey();
+                String key = propertyName(entry.getKey());
                 String value = first(entry.getValue());
-                if (RESERVED_PARAMS.contains(key) || value == null || value.isBlank()) {
+                if (RESERVED_PARAMS.contains(entry.getKey()) || value == null || value.isBlank()) {
                     continue;
                 }
                 predicates.add(builder.like(builder.lower(path(root, key).as(String.class)), "%" + value.toLowerCase(Locale.ROOT) + "%"));
             }
 
-            String dateField = first(params, "dateField");
+            String dateField = first(params, "date_field", "dateField");
             if (dateField == null || dateField.isBlank()) {
                 dateField = defaultDateField;
             }
-            String startDate = first(params, "startDate");
-            String endDate = first(params, "endDate");
+            String startDate = first(params, "start_date", "startDate");
+            String endDate = first(params, "end_date", "endDate");
             if (dateField != null && !dateField.isBlank() && startDate != null && !startDate.isBlank()) {
                 predicates.add(builder.greaterThanOrEqualTo(path(root, dateField).as(LocalDate.class), LocalDate.parse(startDate)));
             }
@@ -70,20 +70,20 @@ public class QueryUtil {
             }
 
             for (Map.Entry<String, String[]> entry : params.entrySet()) {
-                String key = entry.getKey();
+                String key = propertyName(entry.getKey());
                 String value = first(entry.getValue());
-                if (RESERVED_PARAMS.contains(key) || value == null || value.isBlank()) {
+                if (RESERVED_PARAMS.contains(entry.getKey()) || value == null || value.isBlank()) {
                     continue;
                 }
                 predicates.add(builder.like(builder.lower(path(root, key).as(String.class)), "%" + value.toLowerCase(Locale.ROOT) + "%"));
             }
 
-            String dateField = first(params, "dateField");
+            String dateField = first(params, "date_field", "dateField");
             if (dateField == null || dateField.isBlank()) {
                 dateField = defaultDateField;
             }
-            String startDate = first(params, "startDate");
-            String endDate = first(params, "endDate");
+            String startDate = first(params, "start_date", "startDate");
+            String endDate = first(params, "end_date", "endDate");
             if (dateField != null && !dateField.isBlank() && startDate != null && !startDate.isBlank()) {
                 predicates.add(builder.greaterThanOrEqualTo(path(root, dateField).as(LocalDateTime.class), LocalDate.parse(startDate).atStartOfDay()));
             }
@@ -97,7 +97,7 @@ public class QueryUtil {
 
     public static String sortField(Map<String, String[]> params) {
         String sort = first(params, "sort");
-        return sort == null || sort.isBlank() ? "id" : sort;
+        return sort == null || sort.isBlank() ? "id" : propertyName(sort);
     }
 
     public static String direction(Map<String, String[]> params) {
@@ -107,6 +107,11 @@ public class QueryUtil {
 
     private static String first(Map<String, String[]> params, String key) {
         return first(params.get(key));
+    }
+
+    private static String first(Map<String, String[]> params, String primaryKey, String fallbackKey) {
+        String value = first(params, primaryKey);
+        return value == null ? first(params, fallbackKey) : value;
     }
 
     private static String first(String[] values) {
@@ -122,5 +127,22 @@ public class QueryUtil {
             current = current.get(part);
         }
         return current;
+    }
+
+    private static String propertyName(String value) {
+        if (value == null || !value.contains("_")) {
+            return value;
+        }
+        StringBuilder result = new StringBuilder();
+        boolean uppercaseNext = false;
+        for (char character : value.toCharArray()) {
+            if (character == '_') {
+                uppercaseNext = true;
+                continue;
+            }
+            result.append(uppercaseNext ? Character.toUpperCase(character) : character);
+            uppercaseNext = false;
+        }
+        return result.toString();
     }
 }

@@ -10,9 +10,12 @@ import com.rvinproject.camerarentalbe.helper.JSONFormat;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -38,15 +41,52 @@ public class ItemController {
         return ResponseEntity.ok(JSONFormat.success(service.item(id), "Berhasil mengambil item"));
     }
 
-    @PostMapping("/api/items")
+    @PostMapping(value = "/api/items", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createItem(@Valid @RequestBody ItemRequest body, HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
         return ResponseEntity.ok(JSONFormat.success(service.saveItem(null, body), "Berhasil membuat item"));
     }
 
-    @PutMapping("/api/items/{id}")
+    @PostMapping(value = "/api/items", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createItemMultipart(@RequestParam("category_id") Long categoryId,
+                                                 @RequestParam(value = "category_detail_id", required = false) Long categoryDetailId,
+                                                 @RequestParam("name") String name,
+                                                 @RequestParam(value = "brand", required = false) String brand,
+                                                 @RequestParam(value = "model", required = false) String model,
+                                                 @RequestParam(value = "serial_number", required = false) String serialNumber,
+                                                 @RequestParam(value = "description", required = false) String description,
+                                                 @RequestParam("daily_price") BigDecimal dailyPrice,
+                                                 @RequestParam("stock") Integer stock,
+                                                 @RequestParam("status") String status,
+                                                 @RequestParam(value = "image_upload", required = false) MultipartFile imageUpload,
+                                                 HttpServletRequest request) {
+        AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
+        ItemRequest body = itemRequest(categoryId, categoryDetailId, name, brand, model, serialNumber, description, dailyPrice, stock, status, imageUpload);
+        return ResponseEntity.ok(JSONFormat.success(service.saveItem(null, body), "Berhasil membuat item"));
+    }
+
+    @PutMapping(value = "/api/items/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateItem(@PathVariable Long id, @Valid @RequestBody ItemRequest body, HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
+        return ResponseEntity.ok(JSONFormat.success(service.saveItem(id, body), "Berhasil mengubah item"));
+    }
+
+    @PutMapping(value = "/api/items/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateItemMultipart(@PathVariable Long id,
+                                                 @RequestParam("category_id") Long categoryId,
+                                                 @RequestParam(value = "category_detail_id", required = false) Long categoryDetailId,
+                                                 @RequestParam("name") String name,
+                                                 @RequestParam(value = "brand", required = false) String brand,
+                                                 @RequestParam(value = "model", required = false) String model,
+                                                 @RequestParam(value = "serial_number", required = false) String serialNumber,
+                                                 @RequestParam(value = "description", required = false) String description,
+                                                 @RequestParam("daily_price") BigDecimal dailyPrice,
+                                                 @RequestParam("stock") Integer stock,
+                                                 @RequestParam("status") String status,
+                                                 @RequestParam(value = "image_upload", required = false) MultipartFile imageUpload,
+                                                 HttpServletRequest request) {
+        AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
+        ItemRequest body = itemRequest(categoryId, categoryDetailId, name, brand, model, serialNumber, description, dailyPrice, stock, status, imageUpload);
         return ResponseEntity.ok(JSONFormat.success(service.saveItem(id, body), "Berhasil mengubah item"));
     }
 
@@ -55,5 +95,23 @@ public class ItemController {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
         service.deleteItem(id);
         return ResponseEntity.ok(JSONFormat.success(null, "Berhasil menghapus item"));
+    }
+
+    private ItemRequest itemRequest(Long categoryId, Long categoryDetailId, String name, String brand, String model,
+                                    String serialNumber, String description, BigDecimal dailyPrice, Integer stock,
+                                    String status, MultipartFile imageUpload) {
+        ItemRequest request = new ItemRequest();
+        request.setCategoryId(categoryId);
+        request.setCategoryDetailId(categoryDetailId);
+        request.setName(name);
+        request.setBrand(brand);
+        request.setModel(model);
+        request.setSerialNumber(serialNumber);
+        request.setDescription(description);
+        request.setDailyPrice(dailyPrice);
+        request.setStock(stock);
+        request.setStatus(status);
+        request.setImageUpload(imageUpload);
+        return request;
     }
 }

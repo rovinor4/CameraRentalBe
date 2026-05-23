@@ -1,0 +1,92 @@
+@baseUrl = http://localhost:8080
+
+### Login super admin
+# @name login_super_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### Login admin biasa
+# @name login_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rental@camera-rental.test",
+  "password": "admin123"
+}
+
+### List customers
+GET {{baseUrl}}/api/customers?page=0&size=10&search=Budi&identity_type=id_card&start_date=2026-01-01&end_date=2026-12-31
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Detail customer
+GET {{baseUrl}}/api/customers/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Create customer
+POST {{baseUrl}}/api/customers
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: multipart/form-data; boundary=CustomerCreateBoundary
+
+--CustomerCreateBoundary
+Content-Disposition: form-data; name="name"
+
+Dewi Lestari
+--CustomerCreateBoundary
+Content-Disposition: form-data; name="phone"
+
+083344455566
+--CustomerCreateBoundary
+Content-Disposition: form-data; name="address"
+
+Jl. Mawar No. 7, Depok
+--CustomerCreateBoundary
+Content-Disposition: form-data; name="identity_type"
+
+id_card
+--CustomerCreateBoundary
+Content-Disposition: form-data; name="identity_number"
+
+3275015505960004
+--CustomerCreateBoundary
+Content-Disposition: form-data; name="identity_image"; filename="ktp.jpg"
+Content-Type: image/jpeg
+
+< ./files/ktp.jpg
+--CustomerCreateBoundary--
+
+### Update customer tanpa upload baru, identity_image lama tetap dipakai
+PUT {{baseUrl}}/api/customers/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+Content-Type: multipart/form-data; boundary=CustomerUpdateBoundary
+
+--CustomerUpdateBoundary
+Content-Disposition: form-data; name="name"
+
+Budi Santoso Updated
+--CustomerUpdateBoundary
+Content-Disposition: form-data; name="phone"
+
+081234567890
+--CustomerUpdateBoundary
+Content-Disposition: form-data; name="address"
+
+Jl. Melati No. 12, Jakarta
+--CustomerUpdateBoundary
+Content-Disposition: form-data; name="identity_type"
+
+id_card
+--CustomerUpdateBoundary
+Content-Disposition: form-data; name="identity_number"
+
+3173010101900001
+--CustomerUpdateBoundary--
+
+### Delete customer
+DELETE {{baseUrl}}/api/customers/4
+Authorization: Bearer {{login_super_admin.response.body.data.token}}

@@ -19,6 +19,7 @@ package "Controller" {
   class CategoryDetailController <<Controller>>
   class ItemController <<Controller>>
   class PaymentMethodController <<Controller>>
+  class StorageController <<Controller>>
   class RentalController <<Controller>>
   class RentalPaymentController <<Controller>>
   class RentalReturnController <<Controller>>
@@ -56,6 +57,7 @@ package "Service" {
   class CategoryDetailService <<Service>>
   class ItemService <<Service>>
   class PaymentMethodService <<Service>>
+  class FileStorageService <<Service>>
   class RentalService <<Service>>
   class RentalPaymentService <<Service>>
   class RentalReturnService <<Service>>
@@ -113,12 +115,14 @@ package "Model" {
     dailyPrice
     stock
     status: ItemStatus
+    image
   }
   class PaymentMethod <<Entity>> {
     id
     name
     type: PaymentMethodType
-    contentType: PaymentContentType
+    content_type: PaymentContentType
+    image_upload
     active
   }
   class Rental <<Entity>> {
@@ -252,6 +256,7 @@ ItemController --> JSONFormat
 PaymentMethodController --> PaymentMethodRequest
 PaymentMethodController --> PaymentMethodService
 PaymentMethodController --> JSONFormat
+StorageController --> FileStorageService
 RentalController --> RentalRequest
 RentalController --> RentalService
 RentalController --> JSONFormat
@@ -280,7 +285,9 @@ CategoryDetailService --> CategoryService
 ItemService --> ItemRepository
 ItemService --> CategoryService
 ItemService --> CategoryDetailService
+ItemService --> FileStorageService
 PaymentMethodService --> PaymentMethodRepository
+PaymentMethodService --> FileStorageService
 RentalService --> RentalRepository
 RentalService --> CustomerRepository
 RentalService --> ItemRepository

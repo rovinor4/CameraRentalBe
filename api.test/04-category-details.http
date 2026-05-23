@@ -1,0 +1,45 @@
+@baseUrl = http://localhost:8080
+
+### Login super admin
+# @name login_super_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### List category details
+GET {{baseUrl}}/api/category-details?page=0&size=10&search=Mirrorless
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Detail category detail
+GET {{baseUrl}}/api/category-details/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Create category detail
+POST {{baseUrl}}/api/category-details
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "category_id": 3,
+  "name": "Memory Card",
+  "description": "Kartu memori dan storage"
+}
+
+### Update category detail
+PUT {{baseUrl}}/api/category-details/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "name": "Mirrorless",
+  "description": "Kamera mirrorless untuk foto dan video profesional"
+}
+
+### Delete category detail
+DELETE {{baseUrl}}/api/category-details/7
+Authorization: Bearer {{login_super_admin.response.body.data.token}}

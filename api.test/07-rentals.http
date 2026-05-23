@@ -1,0 +1,69 @@
+@baseUrl = http://localhost:8080
+
+### Login admin biasa
+# @name login_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rental@camera-rental.test",
+  "password": "admin123"
+}
+
+### List rentals
+GET {{baseUrl}}/api/rentals?page=0&size=10&search=RNT&status=ongoing&start_date=2026-05-01&end_date=2026-05-31
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Detail rental
+GET {{baseUrl}}/api/rentals/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Create rental
+POST {{baseUrl}}/api/rentals
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "customer_id": 1,
+  "rental_date": "2026-05-22",
+  "planned_return_date": "2026-05-24",
+  "status": "pending",
+  "note": "Sewa untuk demo request API",
+  "details": [
+    {
+      "item_id": 3,
+      "quantity": 1
+    },
+    {
+      "item_id": 6,
+      "quantity": 1
+    }
+  ]
+}
+
+### Update rental
+PUT {{baseUrl}}/api/rentals/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "customer_id": 1,
+  "rental_date": "2026-05-18",
+  "planned_return_date": "2026-05-21",
+  "status": "ongoing",
+  "note": "Sewa untuk dokumentasi event kantor updated",
+  "details": [
+    {
+      "item_id": 1,
+      "quantity": 1
+    },
+    {
+      "item_id": 6,
+      "quantity": 1
+    }
+  ]
+}
+
+### Delete rental
+DELETE {{baseUrl}}/api/rentals/3
+Authorization: Bearer {{login_admin.response.body.data.token}}

@@ -32,12 +32,12 @@ VALUES
     ((SELECT id FROM categories WHERE name = 'Accessory'), (SELECT id FROM category_details WHERE name = 'Stabilizer'), 'DJI RS 3 Mini', 'DJI', 'RS 3 Mini', 'DJI-RS3M-001', 'Stabilizer kamera mirrorless', 125000.00, 1, 'maintenance', 'storage/items/dji-rs3-mini.jpg'),
     ((SELECT id FROM categories WHERE name = 'Accessory'), (SELECT id FROM category_details WHERE name = 'Tripod'), 'Manfrotto Compact Action', 'Manfrotto', 'Compact Action', 'MANFROTTO-CA-001', 'Tripod compact untuk kamera', 50000.00, 4, 'available', 'storage/items/manfrotto-compact.jpg');
 
-INSERT INTO payment_methods (name, type, content_type, content_value, is_active)
+INSERT INTO payment_methods (name, type, content_type, content_value, image_upload, is_active)
 VALUES
-    ('Cash', 'cash', 'text', 'Bayar tunai di kasir', TRUE),
-    ('Bank BCA', 'bank_transfer', 'text', 'BCA 1234567890 a.n Camera Rental', TRUE),
-    ('QRIS Camera Rental', 'qr_code', 'image', 'storage/payments/qris-camera-rental.png', TRUE),
-    ('GoPay', 'e_wallet', 'text', 'GoPay 081234567890 a.n Camera Rental', TRUE);
+    ('Cash', 'cash', 'text', 'Bayar tunai di kasir', NULL, TRUE),
+    ('Bank BCA', 'bank_transfer', 'text', 'BCA 1234567890 a.n Camera Rental', NULL, TRUE),
+    ('QRIS Camera Rental', 'qr_code', 'image', NULL, '/storage/payment-methods/qris-camera-rental.png', TRUE),
+    ('GoPay', 'e_wallet', 'text', 'GoPay 081234567890 a.n Camera Rental', NULL, TRUE);
 
 INSERT INTO rentals (customer_id, admin_id, rental_code, rental_date, planned_return_date, actual_return_date, total_price, status, note)
 VALUES

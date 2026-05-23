@@ -12,12 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentMethodService {
     private final PaymentMethodRepository paymentMethodRepository;
+    private final FileStorageService fileStorageService;
 
     public Page<PaymentMethod> paymentMethods(boolean activeOnly, Specification<PaymentMethod> specification, Pageable pageable) {
         if (activeOnly) {
@@ -41,16 +43,42 @@ public class PaymentMethodService {
 
     public PaymentMethod savePaymentMethod(Long id, PaymentMethodRequest request) {
         PaymentMethod paymentMethod = id == null ? new PaymentMethod() : paymentMethod(id);
+        String oldImageUpload = paymentMethod.getImageUpload();
         paymentMethod.setName(request.getName());
         paymentMethod.setType(ValidationUtil.enumValue(request.getType(), PaymentMethodType.class, "type"));
-        paymentMethod.setContentType(ValidationUtil.enumValue(request.getContentType(), PaymentContentType.class, "contentType"));
-        paymentMethod.setContentValue(request.getContentValue());
+        PaymentContentType contentType = ValidationUtil.enumValue(request.getContentType(), PaymentContentType.class, "content_type");
+        paymentMethod.setContentType(contentType);
+        if (PaymentContentType.text.equals(contentType)) {
+            if (!StringUtils.hasText(request.getContentValue())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "content_value wajib diisi jika content_type text");
+            }
+            paymentMethod.setContentValue(request.getContentValue());
+            paymentMethod.setImageUpload(null);
+        } else {
+            String uploadedImage = fileStorageService.storeImage(request.getImageUpload(), "payment-methods");
+            if (uploadedImage == null && id == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "image_upload wajib diisi jika content_type image");
+            }
+            if (uploadedImage == null && !StringUtils.hasText(paymentMethod.getImageUpload())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "image_upload wajib diisi jika content_type image");
+            }
+            paymentMethod.setContentValue(null);
+            if (uploadedImage != null) {
+                paymentMethod.setImageUpload(uploadedImage);
+            }
+        }
         paymentMethod.setActive(request.getActive());
-        return paymentMethodRepository.save(paymentMethod);
+        PaymentMethod savedPaymentMethod = paymentMethodRepository.save(paymentMethod);
+        if (!StringUtils.hasText(savedPaymentMethod.getImageUpload()) || !savedPaymentMethod.getImageUpload().equals(oldImageUpload)) {
+            fileStorageService.deleteStoredFile(oldImageUpload);
+        }
+        return savedPaymentMethod;
     }
 
     public void deletePaymentMethod(Long id) {
-        paymentMethodRepository.delete(paymentMethod(id));
+        PaymentMethod paymentMethod = paymentMethod(id);
+        paymentMethodRepository.delete(paymentMethod);
+        fileStorageService.deleteStoredFile(paymentMethod.getImageUpload());
     }
 
     private ResponseStatusException notFound(String label) {

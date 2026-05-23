@@ -14,8 +14,8 @@ public class PageUtil {
         data.put("content", page.getContent());
         data.put("page", page.getNumber());
         data.put("size", page.getSize());
-        data.put("totalElements", page.getTotalElements());
-        data.put("totalPages", page.getTotalPages());
+        data.put("total_elements", page.getTotalElements());
+        data.put("total_pages", page.getTotalPages());
         data.put("last", page.isLast());
         return data;
     }

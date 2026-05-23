@@ -1,0 +1,49 @@
+@baseUrl = http://localhost:8080
+
+### Login admin biasa
+# @name login_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rental@camera-rental.test",
+  "password": "admin123"
+}
+
+### List returns
+GET {{baseUrl}}/api/returns?page=0&size=10&search=RNT-DEMO&has_penalty=true&start_date=2026-05-01&end_date=2026-05-31
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Detail return
+GET {{baseUrl}}/api/returns/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Create return
+POST {{baseUrl}}/api/returns
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "rental_id": 1,
+  "return_date": "2026-05-24",
+  "condition_note": "Semua barang kembali lengkap",
+  "has_penalty": false,
+  "penalty_payment_method_id": null
+}
+
+### Update return
+PUT {{baseUrl}}/api/returns/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "rental_id": 2,
+  "return_date": "2026-05-12",
+  "condition_note": "Barang kembali lengkap, ada gores kecil pada body kamera",
+  "has_penalty": true,
+  "penalty_payment_method_id": 1
+}
+
+### Delete return
+DELETE {{baseUrl}}/api/returns/2
+Authorization: Bearer {{login_admin.response.body.data.token}}

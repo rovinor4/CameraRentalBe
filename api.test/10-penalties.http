@@ -1,0 +1,51 @@
+@baseUrl = http://localhost:8080
+
+### Login admin biasa
+# @name login_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "rental@camera-rental.test",
+  "password": "admin123"
+}
+
+### List denda
+GET {{baseUrl}}/api/denda?page=0&size=10&search=damage&status=paid&start_date=2026-05-01&end_date=2026-05-31
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Detail denda
+GET {{baseUrl}}/api/denda/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
+### Create denda
+POST {{baseUrl}}/api/denda
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "return_id": 1,
+  "penalty_type": "late_return",
+  "description": "Keterlambatan pengembalian 1 hari",
+  "amount": 100000,
+  "status": "unpaid",
+  "paid_at": null
+}
+
+### Update denda
+PUT {{baseUrl}}/api/denda/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "return_id": 1,
+  "penalty_type": "damage",
+  "description": "Gores kecil pada body kamera",
+  "amount": 50000,
+  "status": "paid",
+  "paid_at": "2026-05-12T17:00:00"
+}
+
+### Delete denda
+DELETE {{baseUrl}}/api/denda/2
+Authorization: Bearer {{login_admin.response.body.data.token}}

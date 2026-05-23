@@ -1,0 +1,51 @@
+@baseUrl = http://localhost:8080
+
+### Login super admin
+# @name login_super_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### List maintenance
+GET {{baseUrl}}/api/maintenance?page=0&size=10&search=Kalibrasi&status=in_progress&start_date=2026-05-01&end_date=2026-05-31
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Detail maintenance
+GET {{baseUrl}}/api/maintenance/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Create maintenance
+POST {{baseUrl}}/api/maintenance
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "item_id": 2,
+  "title": "Sensor cleaning",
+  "description": "Pembersihan sensor dan pengecekan shutter",
+  "maintenance_date": "2026-05-25",
+  "cost": 200000,
+  "status": "in_progress"
+}
+
+### Update maintenance
+PUT {{baseUrl}}/api/maintenance/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "item_id": 5,
+  "title": "Kalibrasi gimbal selesai",
+  "description": "Kalibrasi motor dan pengecekan baterai selesai",
+  "maintenance_date": "2026-05-20",
+  "cost": 150000,
+  "status": "completed"
+}
+
+### Delete maintenance
+DELETE {{baseUrl}}/api/maintenance/2
+Authorization: Bearer {{login_super_admin.response.body.data.token}}

@@ -1,0 +1,43 @@
+@baseUrl = http://localhost:8080
+
+### Login super admin
+# @name login_super_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### List categories
+GET {{baseUrl}}/api/categories?page=0&size=10&search=Camera
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Detail category
+GET {{baseUrl}}/api/categories/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+
+### Create category
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "name": "Lighting",
+  "description": "Lampu dan perlengkapan lighting"
+}
+
+### Update category
+PUT {{baseUrl}}/api/categories/1
+Authorization: Bearer {{login_super_admin.response.body.data.token}}
+Content-Type: application/json
+
+{
+  "name": "Camera",
+  "description": "Kamera untuk kebutuhan foto dan video profesional"
+}
+
+### Delete category
+DELETE {{baseUrl}}/api/categories/4
+Authorization: Bearer {{login_super_admin.response.body.data.token}}

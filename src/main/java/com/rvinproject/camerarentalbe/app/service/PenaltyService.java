@@ -32,7 +32,7 @@ public class PenaltyService {
         Penalty penalty = id == null ? new Penalty() : penalty(id);
         PenaltyStatus status = ValidationUtil.enumValue(request.getStatus(), PenaltyStatus.class, "status");
         penalty.setRentalReturn(rentalReturnService.rentalReturn(request.getReturnId()));
-        penalty.setPenaltyType(ValidationUtil.enumValue(request.getPenaltyType(), PenaltyType.class, "penaltyType"));
+        penalty.setPenaltyType(ValidationUtil.enumValue(request.getPenaltyType(), PenaltyType.class, "penalty_type"));
         penalty.setDescription(request.getDescription());
         penalty.setAmount(request.getAmount());
         penalty.setStatus(status);

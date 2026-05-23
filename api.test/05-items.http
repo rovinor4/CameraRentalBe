@@ -1,0 +1,131 @@
+@baseUrl = http://localhost:8080
+@token = {{login_super_admin.response.body.data.token}}
+
+### Login super admin
+# @name login_super_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### List items
+GET {{baseUrl}}/api/items?page=0&size=10&search=Sony&status=available&sort=name&direction=asc
+Authorization: Bearer {{token}}
+
+### Detail item
+GET {{baseUrl}}/api/items/1
+Authorization: Bearer {{token}}
+
+### Create item with image upload
+POST {{baseUrl}}/api/items
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=ItemCreateBoundary
+
+--ItemCreateBoundary
+Content-Disposition: form-data; name="category_id"
+
+1
+--ItemCreateBoundary
+Content-Disposition: form-data; name="category_detail_id"
+
+1
+--ItemCreateBoundary
+Content-Disposition: form-data; name="name"
+
+Fujifilm X-T5
+--ItemCreateBoundary
+Content-Disposition: form-data; name="brand"
+
+Fujifilm
+--ItemCreateBoundary
+Content-Disposition: form-data; name="model"
+
+X-T5
+--ItemCreateBoundary
+Content-Disposition: form-data; name="serial_number"
+
+FUJI-XT5-001
+--ItemCreateBoundary
+Content-Disposition: form-data; name="description"
+
+Mirrorless APS-C high resolution
+--ItemCreateBoundary
+Content-Disposition: form-data; name="daily_price"
+
+225000
+--ItemCreateBoundary
+Content-Disposition: form-data; name="stock"
+
+2
+--ItemCreateBoundary
+Content-Disposition: form-data; name="status"
+
+available
+--ItemCreateBoundary
+Content-Disposition: form-data; name="image_upload"; filename="item.jpg"
+Content-Type: image/jpeg
+
+< ./files/item.jpg
+--ItemCreateBoundary--
+
+### Update item with image upload
+PUT {{baseUrl}}/api/items/1
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=ItemUpdateBoundary
+
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="category_id"
+
+1
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="category_detail_id"
+
+1
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="name"
+
+Sony A7 III Updated
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="brand"
+
+Sony
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="model"
+
+A7 III
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="serial_number"
+
+SONY-A7III-001
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="description"
+
+Full-frame mirrorless camera updated
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="daily_price"
+
+255000
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="stock"
+
+2
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="status"
+
+available
+--ItemUpdateBoundary
+Content-Disposition: form-data; name="image_upload"; filename="item-update.jpg"
+Content-Type: image/jpeg
+
+< ./files/item-update.jpg
+--ItemUpdateBoundary--
+
+### Delete item
+DELETE {{baseUrl}}/api/items/7
+Authorization: Bearer {{token}}
+
+### Access uploaded item image
+GET {{baseUrl}}/storage/filename.jpg

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -20,6 +21,7 @@ public class RentalPaymentService {
     private final RentalPaymentRepository rentalPaymentRepository;
     private final RentalService rentalService;
     private final PaymentMethodService paymentMethodService;
+    private final FileStorageService fileStorageService;
 
     public Page<RentalPayment> rentalPayments(Specification<RentalPayment> specification, Pageable pageable) {
         return rentalPaymentRepository.findAll(specification, pageable);
@@ -31,6 +33,7 @@ public class RentalPaymentService {
 
     public RentalPayment saveRentalPayment(Long id, RentalPaymentRequest request) {
         RentalPayment payment = id == null ? new RentalPayment() : rentalPayment(id);
+        String oldProofImage = payment.getProofImage();
         payment.setRental(rentalService.rental(request.getRentalId()));
         payment.setPaymentMethod(paymentMethodService.activePaymentMethod(request.getPaymentMethodId()));
         if (payment.getPaymentCode() == null) {
@@ -39,12 +42,26 @@ public class RentalPaymentService {
         payment.setAmount(request.getAmount());
         payment.setPaymentDate(request.getPaymentDate());
         payment.setStatus(ValidationUtil.enumValue(request.getStatus(), PaymentStatus.class, "status"));
-        payment.setProofImage(request.getProofImage());
-        return rentalPaymentRepository.save(payment);
+        String uploadedProofImage = fileStorageService.storeImage(request.getProofImageUpload(), "rental-payments");
+        if (uploadedProofImage == null && id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "proof_image_upload wajib diisi");
+        }
+        if (uploadedProofImage != null) {
+            payment.setProofImage(uploadedProofImage);
+        } else if (!StringUtils.hasText(payment.getProofImage())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "proof_image_upload wajib diisi");
+        }
+        RentalPayment savedPayment = rentalPaymentRepository.save(payment);
+        if (uploadedProofImage != null) {
+            fileStorageService.deleteStoredFile(oldProofImage);
+        }
+        return savedPayment;
     }
 
     public void deleteRentalPayment(Long id) {
-        rentalPaymentRepository.delete(rentalPayment(id));
+        RentalPayment payment = rentalPayment(id);
+        rentalPaymentRepository.delete(payment);
+        fileStorageService.deleteStoredFile(payment.getProofImage());
     }
 
     private ResponseStatusException notFound(String label) {
