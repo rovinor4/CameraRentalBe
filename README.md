@@ -1,6 +1,6 @@
 # Camera Rental Backend API
 
-![Sistem Managemen Rental Kamera Rovino Ramadhani](./Banner.png)
+![Sistem Managemen Rental Kamera Rovino Ramadhani](./README.avif)
 
 Repository ini berisi implementasi backend API untuk sistem Camera Rental Management menggunakan Spring Boot.
 
