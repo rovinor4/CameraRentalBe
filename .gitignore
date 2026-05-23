@@ -33,3 +33,4 @@ build/
 .vscode/
 
 storage/log/*
+src/main/resources/application.properties
