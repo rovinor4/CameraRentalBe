@@ -14,6 +14,10 @@ Content-Type: application/json
 GET {{baseUrl}}/api/rentals?page=0&size=10&search=RNT&status=ongoing&start_date=2026-05-01&end_date=2026-05-31
 Authorization: Bearer {{login_admin.response.body.data.token}}
 
+### List rental not returned
+GET {{baseUrl}}/api/rental-not-returned
+Authorization: Bearer {{login_admin.response.body.data.token}}
+
 ### Detail rental
 GET {{baseUrl}}/api/rentals/1
 Authorization: Bearer {{login_admin.response.body.data.token}}
@@ -31,12 +35,10 @@ Content-Type: application/json
   "note": "Sewa untuk demo request API",
   "details": [
     {
-      "item_id": 3,
-      "quantity": 1
+      "item_status_id": 4
     },
     {
-      "item_id": 6,
-      "quantity": 1
+      "item_status_id": 11
     }
   ]
 }
@@ -54,15 +56,17 @@ Content-Type: application/json
   "note": "Sewa untuk dokumentasi event kantor updated",
   "details": [
     {
-      "item_id": 1,
-      "quantity": 1
+      "item_status_id": 2
     },
     {
-      "item_id": 6,
-      "quantity": 1
+      "item_status_id": 12
     }
   ]
 }
+
+### Delete rental detail
+DELETE {{baseUrl}}/api/rental-details/1
+Authorization: Bearer {{login_admin.response.body.data.token}}
 
 ### Delete rental
 DELETE {{baseUrl}}/api/rentals/3

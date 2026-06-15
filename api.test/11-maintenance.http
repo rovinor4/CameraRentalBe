@@ -1,4 +1,5 @@
 @baseUrl = http://localhost:8080
+@token= 7IN29eljaNUi54L4ccpsRdmH3fCL5tgTp1DaQA9jQuB8qaA8J0u7tqdYnklgNmL31654JfgBW84IXkIZLXWf4qSXGt1X5TKvEOSg
 
 ### Login super admin
 # @name login_super_admin
@@ -11,8 +12,9 @@ Content-Type: application/json
 }
 
 ### List maintenance
-GET {{baseUrl}}/api/maintenance?page=0&size=10&search=Kalibrasi&status=in_progress&start_date=2026-05-01&end_date=2026-05-31
-Authorization: Bearer {{login_super_admin.response.body.data.token}}
+GET {{baseUrl}}/api/maintenance?page=0&size=10&search=Kalibrasi&status=in_progress&start_date=2026-05-01&
+    end_date=2026-05-31
+Authorization: Bearer {{token}}
 
 ### Detail maintenance
 GET {{baseUrl}}/api/maintenance/1
@@ -24,7 +26,7 @@ Authorization: Bearer {{login_super_admin.response.body.data.token}}
 Content-Type: application/json
 
 {
-  "item_id": 2,
+  "item_status_id": 3,
   "title": "Sensor cleaning",
   "description": "Pembersihan sensor dan pengecekan shutter",
   "maintenance_date": "2026-05-25",
@@ -38,7 +40,7 @@ Authorization: Bearer {{login_super_admin.response.body.data.token}}
 Content-Type: application/json
 
 {
-  "item_id": 5,
+  "item_status_id": 8,
   "title": "Kalibrasi gimbal selesai",
   "description": "Kalibrasi motor dan pengecekan baterai selesai",
   "maintenance_date": "2026-05-20",

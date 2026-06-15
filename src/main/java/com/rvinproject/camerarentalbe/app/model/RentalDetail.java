@@ -21,8 +21,8 @@ public class RentalDetail {
     @JsonIgnore
     private Rental rental;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    @JoinColumn(name = "item_status_id", nullable = false)
+    private ItemStatusRecord itemStatus;
     @Column(name = "daily_price", nullable = false)
     private BigDecimal dailyPrice;
     @Column(nullable = false)
@@ -33,4 +33,9 @@ public class RentalDetail {
     private LocalDateTime createdAt;
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @Transient
+    public Item getItem() {
+        return itemStatus == null ? null : itemStatus.getItem();
+    }
 }

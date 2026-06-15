@@ -18,8 +18,8 @@ public class ItemMaintenance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    @JoinColumn(name = "item_status_id", nullable = false)
+    private ItemStatusRecord itemStatus;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
@@ -38,4 +38,9 @@ public class ItemMaintenance {
     private LocalDateTime createdAt;
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @Transient
+    public Item getItem() {
+        return itemStatus == null ? null : itemStatus.getItem();
+    }
 }

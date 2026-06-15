@@ -38,6 +38,11 @@ public class RentalController {
         return ResponseEntity.ok(JSONFormat.success(service.rental(id), "Berhasil mengambil rental"));
     }
 
+    @GetMapping("/api/rental-not-returned")
+    public ResponseEntity<?> rentalNotReturned() {
+        return ResponseEntity.ok(JSONFormat.success(service.rentalNotReturned(), "Berhasil mengambil rental belum kembali"));
+    }
+
     @PostMapping("/api/rentals")
     public ResponseEntity<?> createRental(@Valid @RequestBody RentalRequest body, HttpServletRequest request) {
         return ResponseEntity.ok(JSONFormat.success(service.createRental(body, AuthUtil.admin(request)), "Berhasil membuat rental"));
@@ -52,5 +57,11 @@ public class RentalController {
     public ResponseEntity<?> deleteRental(@PathVariable Long id) {
         service.deleteRental(id);
         return ResponseEntity.ok(JSONFormat.success(null, "Berhasil menghapus rental"));
+    }
+
+    @DeleteMapping("/api/rental-details/{id}")
+    public ResponseEntity<?> deleteRentalDetail(@PathVariable Long id) {
+        service.deleteRentalDetail(id);
+        return ResponseEntity.ok(JSONFormat.success(null, "Berhasil menghapus rental detail"));
     }
 }

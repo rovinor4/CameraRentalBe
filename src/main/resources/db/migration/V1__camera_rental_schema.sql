@@ -65,17 +65,26 @@ CREATE TABLE IF NOT EXISTS items (
     description TEXT NULL,
     daily_price DECIMAL(15,2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
-    status VARCHAR(50) NOT NULL DEFAULT 'available',
     image VARCHAR(255) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_items_category_id (category_id),
     INDEX idx_items_category_detail_id (category_detail_id),
-    INDEX idx_items_status (status),
     CONSTRAINT fk_items_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
     CONSTRAINT fk_items_category_detail FOREIGN KEY (category_detail_id) REFERENCES category_details(id) ON DELETE SET NULL,
     CONSTRAINT chk_items_stock CHECK (stock >= 0),
     CONSTRAINT chk_items_daily_price CHECK (daily_price >= 0)
+);
+
+CREATE TABLE IF NOT EXISTS item_statuses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    item_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'available',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_item_statuses_item_id (item_id),
+    INDEX idx_item_statuses_status (status),
+    CONSTRAINT fk_item_statuses_item FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS payment_methods (
@@ -116,16 +125,16 @@ CREATE TABLE IF NOT EXISTS rentals (
 CREATE TABLE IF NOT EXISTS rental_details (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     rental_id BIGINT NOT NULL,
-    item_id BIGINT NOT NULL,
+    item_status_id BIGINT NOT NULL,
     daily_price DECIMAL(15,2) NOT NULL,
     quantity INT NOT NULL,
     subtotal DECIMAL(15,2) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_rental_details_rental_id (rental_id),
-    INDEX idx_rental_details_item_id (item_id),
+    INDEX idx_rental_details_item_status_id (item_status_id),
     CONSTRAINT fk_rental_details_rental FOREIGN KEY (rental_id) REFERENCES rentals(id) ON DELETE CASCADE,
-    CONSTRAINT fk_rental_details_item FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_rental_details_item_status FOREIGN KEY (item_status_id) REFERENCES item_statuses(id) ON DELETE RESTRICT,
     CONSTRAINT chk_rental_details_quantity CHECK (quantity > 0)
 );
 
@@ -183,7 +192,7 @@ CREATE TABLE IF NOT EXISTS penalties (
 
 CREATE TABLE IF NOT EXISTS item_maintenance (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    item_id BIGINT NOT NULL,
+    item_status_id BIGINT NOT NULL,
     admin_id BIGINT NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT NULL,
@@ -192,10 +201,10 @@ CREATE TABLE IF NOT EXISTS item_maintenance (
     status VARCHAR(50) NOT NULL DEFAULT 'in_progress',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_item_maintenance_item_id (item_id),
+    INDEX idx_item_maintenance_item_status_id (item_status_id),
     INDEX idx_item_maintenance_admin_id (admin_id),
     INDEX idx_item_maintenance_status (status),
-    CONSTRAINT fk_item_maintenance_item FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_item_maintenance_item_status FOREIGN KEY (item_status_id) REFERENCES item_statuses(id) ON DELETE RESTRICT,
     CONSTRAINT fk_item_maintenance_admin FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE RESTRICT,
     CONSTRAINT chk_item_maintenance_cost CHECK (cost >= 0)
 );

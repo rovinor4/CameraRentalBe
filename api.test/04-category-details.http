@@ -10,36 +10,34 @@ Content-Type: application/json
   "password": "admin123"
 }
 
-### List category details
-GET {{baseUrl}}/api/category-details?page=0&size=10&search=Mirrorless
+### List category details by category
+GET {{baseUrl}}/api/categories-detail/get/1
 Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
 ### Detail category detail
 GET {{baseUrl}}/api/category-details/1
 Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
-### Create category detail
-POST {{baseUrl}}/api/category-details
+### Create category detail by category
+POST {{baseUrl}}/api/categories-detail/create/3
 Authorization: Bearer {{login_super_admin.response.body.data.token}}
 Content-Type: application/json
 
 {
-  "category_id": 3,
   "name": "Memory Card",
   "description": "Kartu memori dan storage"
 }
 
-### Update category detail
-PUT {{baseUrl}}/api/category-details/1
+### Update category detail by category
+PUT {{baseUrl}}/api/categories-detail/update/1/1
 Authorization: Bearer {{login_super_admin.response.body.data.token}}
 Content-Type: application/json
 
 {
-  "category_id": 1,
   "name": "Mirrorless",
   "description": "Kamera mirrorless untuk foto dan video profesional"
 }
 
-### Delete category detail
-DELETE {{baseUrl}}/api/category-details/7
+### Delete category detail by category
+DELETE {{baseUrl}}/api/categories-detail/delete/3/7
 Authorization: Bearer {{login_super_admin.response.body.data.token}}

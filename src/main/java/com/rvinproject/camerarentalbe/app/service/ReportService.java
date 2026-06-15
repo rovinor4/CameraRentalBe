@@ -64,12 +64,13 @@ public class ReportService {
     }
 
     public String items() {
-        StringBuilder csv = new StringBuilder("id,name,category,category_detail,brand,model,serial_number,daily_price,stock,status\n");
+        StringBuilder csv = new StringBuilder("id,name,category,category_detail,brand,model,serial_number,daily_price,stock,available_count,rented_count,maintenance_count,inactive_count\n");
         for (Item row : itemRepository.findAll()) {
             csv.append(row.getId()).append(',').append(esc(row.getName())).append(',').append(esc(row.getCategory().getName())).append(',')
                     .append(esc(row.getCategoryDetail() == null ? null : row.getCategoryDetail().getName())).append(',').append(esc(row.getBrand())).append(',')
                     .append(esc(row.getModel())).append(',').append(esc(row.getSerialNumber())).append(',').append(row.getDailyPrice()).append(',')
-                    .append(row.getStock()).append(',').append(row.getStatus()).append('\n');
+                    .append(row.getStock()).append(',').append(row.getAvailableCount()).append(',').append(row.getRentedCount()).append(',')
+                    .append(row.getMaintenanceCount()).append(',').append(row.getInactiveCount()).append('\n');
         }
         return csv.toString();
     }
@@ -78,9 +79,11 @@ public class ReportService {
         LocalDateTime start = startDate == null ? null : startDate.atStartOfDay();
         LocalDateTime end = endDate == null ? null : endDate.atTime(LocalTime.MAX);
         List<RentalPayment> rows = start == null || end == null ? rentalPaymentRepository.findAll() : rentalPaymentRepository.findByCreatedAtBetween(start, end);
-        StringBuilder csv = new StringBuilder("id,payment_code,rental_code,payment_method,amount,payment_date,status,proof_image\n");
+        StringBuilder csv = new StringBuilder("id,payment_code,rental_code,penalty_id,payment_method,amount,payment_date,status,proof_image\n");
         for (RentalPayment row : rows) {
-            csv.append(row.getId()).append(',').append(esc(row.getPaymentCode())).append(',').append(esc(row.getRental().getRentalCode())).append(',')
+            csv.append(row.getId()).append(',').append(esc(row.getPaymentCode())).append(',')
+                    .append(esc(row.getRental() == null ? null : row.getRental().getRentalCode())).append(',')
+                    .append(row.getPenalty() == null ? "" : row.getPenalty().getId()).append(',')
                     .append(esc(row.getPaymentMethod().getName())).append(',').append(row.getAmount()).append(',').append(row.getPaymentDate()).append(',')
                     .append(row.getStatus()).append(',').append(esc(row.getProofImage())).append('\n');
         }

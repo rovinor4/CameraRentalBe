@@ -1,10 +1,9 @@
 package com.rvinproject.camerarentalbe.app.service;
 
 import com.rvinproject.camerarentalbe.app.dto.request.ItemRequest;
-import com.rvinproject.camerarentalbe.app.enumModel.ItemStatus;
 import com.rvinproject.camerarentalbe.app.model.Item;
+import com.rvinproject.camerarentalbe.app.model.ItemStatusRecord;
 import com.rvinproject.camerarentalbe.app.repository.ItemRepository;
-import com.rvinproject.camerarentalbe.app.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +20,19 @@ public class ItemService {
     private final CategoryService categoryService;
     private final CategoryDetailService categoryDetailService;
     private final FileStorageService fileStorageService;
+    private final ItemStatusService itemStatusService;
 
     public Page<Item> items(Specification<Item> specification, Pageable pageable) {
         return itemRepository.findAll(specification, pageable);
+    }
+
+    public Page<Item> availableItems(Pageable pageable) {
+        return itemRepository.findDistinctByItemStatusesStatus(com.rvinproject.camerarentalbe.app.enumModel.ItemStatus.available, pageable);
+    }
+
+    public ItemStatusRecord availableItemStatus(Long itemId) {
+        item(itemId);
+        return itemStatusService.availableItemStatus(itemId);
     }
 
     public Item item(Long id) {
@@ -32,6 +41,9 @@ public class ItemService {
 
     public Item saveItem(Long id, ItemRequest request) {
         Item item = id == null ? new Item() : item(id);
+        if (id == null && request.getStock() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "stock wajib diisi");
+        }
         String oldImage = item.getImage();
         item.setCategory(categoryService.category(request.getCategoryId()));
         item.setCategoryDetail(request.getCategoryDetailId() == null ? null : categoryDetailService.categoryDetail(request.getCategoryDetailId()));
@@ -41,8 +53,9 @@ public class ItemService {
         item.setSerialNumber(request.getSerialNumber());
         item.setDescription(request.getDescription());
         item.setDailyPrice(request.getDailyPrice());
-        item.setStock(request.getStock());
-        item.setStatus(ValidationUtil.enumValue(request.getStatus(), ItemStatus.class, "status"));
+        if (id == null) {
+            item.setStock(request.getStock());
+        }
         String uploadedImage = fileStorageService.storeImage(request.getImageUpload(), "public");
         if (uploadedImage == null && id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "image_upload wajib diisi");
@@ -53,6 +66,13 @@ public class ItemService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "image_upload wajib diisi");
         }
         Item savedItem = itemRepository.save(item);
+        if (id == null) {
+            for (int i = 0; i < request.getStock(); i++) {
+                itemStatusService.createAvailable(savedItem);
+            }
+        } else {
+            itemStatusService.syncItemStock(savedItem);
+        }
         if (uploadedImage != null) {
             fileStorageService.deleteStoredFile(oldImage);
         }

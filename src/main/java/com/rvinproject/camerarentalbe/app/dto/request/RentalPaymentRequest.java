@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class RentalPaymentRequest {
-    @NotNull
     private Long rentalId;
+    private Long penaltyId;
     @NotNull
     private Long paymentMethodId;
     @NotNull

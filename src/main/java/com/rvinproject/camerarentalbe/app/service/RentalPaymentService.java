@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class RentalPaymentService {
     private final RentalPaymentRepository rentalPaymentRepository;
     private final RentalService rentalService;
+    private final PenaltyService penaltyService;
     private final PaymentMethodService paymentMethodService;
     private final FileStorageService fileStorageService;
 
@@ -31,10 +32,22 @@ public class RentalPaymentService {
         return rentalPaymentRepository.findById(id).orElseThrow(() -> notFound("rental payment"));
     }
 
+    public java.util.List<RentalPayment> rentalPaymentsByRental(Long rentalId) {
+        rentalService.rental(rentalId);
+        return rentalPaymentRepository.findByRentalId(rentalId);
+    }
+
+    public java.util.List<RentalPayment> rentalPaymentsByPenalty(Long penaltyId) {
+        penaltyService.penalty(penaltyId);
+        return rentalPaymentRepository.findByPenaltyId(penaltyId);
+    }
+
     public RentalPayment saveRentalPayment(Long id, RentalPaymentRequest request) {
         RentalPayment payment = id == null ? new RentalPayment() : rentalPayment(id);
         String oldProofImage = payment.getProofImage();
-        payment.setRental(rentalService.rental(request.getRentalId()));
+        validateTarget(request.getRentalId(), request.getPenaltyId());
+        payment.setRental(request.getRentalId() == null ? null : rentalService.rental(request.getRentalId()));
+        payment.setPenalty(request.getPenaltyId() == null ? null : penaltyService.penalty(request.getPenaltyId()));
         payment.setPaymentMethod(paymentMethodService.activePaymentMethod(request.getPaymentMethodId()));
         if (payment.getPaymentCode() == null) {
             payment.setPaymentCode("PAY-" + StringHelper.RandomString(12));
@@ -43,7 +56,10 @@ public class RentalPaymentService {
         payment.setPaymentDate(request.getPaymentDate());
         payment.setStatus(ValidationUtil.enumValue(request.getStatus(), PaymentStatus.class, "status"));
         String uploadedProofImage = fileStorageService.storeImage(request.getProofImageUpload(), "rental-payments");
-        if (uploadedProofImage == null && id == null) {
+        if (uploadedProofImage == null && StringUtils.hasText(request.getProofImage())) {
+            payment.setProofImage(request.getProofImage());
+        }
+        if (uploadedProofImage == null && id == null && !StringUtils.hasText(payment.getProofImage())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "proof_image_upload wajib diisi");
         }
         if (uploadedProofImage != null) {
@@ -62,6 +78,15 @@ public class RentalPaymentService {
         RentalPayment payment = rentalPayment(id);
         rentalPaymentRepository.delete(payment);
         fileStorageService.deleteStoredFile(payment.getProofImage());
+    }
+
+    private void validateTarget(Long rentalId, Long penaltyId) {
+        if (rentalId == null && penaltyId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "rental_id atau penalty_id wajib diisi");
+        }
+        if (rentalId != null && penaltyId != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "payment detail hanya boleh punya satu target rental_id atau penalty_id");
+        }
     }
 
     private ResponseStatusException notFound(String label) {

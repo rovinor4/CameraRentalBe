@@ -1,5 +1,6 @@
 package com.rvinproject.camerarentalbe.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rvinproject.camerarentalbe.app.enumModel.RentalStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -42,8 +43,35 @@ public class Rental {
     private String note;
     @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RentalDetail> details = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "rental")
+    private List<RentalPayment> payments = new ArrayList<>();
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @Transient
+    public BigDecimal getTotal() {
+        return totalPrice;
+    }
+
+    @Transient
+    public BigDecimal getTotalPaid() {
+        return payments.stream()
+                .filter(payment -> com.rvinproject.camerarentalbe.app.enumModel.PaymentStatus.paid.equals(payment.getStatus()))
+                .map(RentalPayment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transient
+    public BigDecimal getRemainingPayment() {
+        BigDecimal remaining = totalPrice.subtract(getTotalPaid());
+        return remaining.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : remaining;
+    }
+
+    @Transient
+    public BigDecimal getBalanceDue() {
+        return getRemainingPayment();
+    }
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 public class ItemController {
-    private static final List<String> SEARCH_FIELDS = List.of("id", "category.name", "categoryDetail.name", "name", "brand", "model", "serialNumber", "description", "dailyPrice", "stock", "status", "image", "createdAt", "updatedAt");
+    private static final List<String> SEARCH_FIELDS = List.of("id", "category.name", "categoryDetail.name", "name", "brand", "model", "serialNumber", "description", "dailyPrice", "stock", "image", "createdAt", "updatedAt");
     private final ItemService service;
 
     @GetMapping("/api/items")
@@ -41,6 +41,17 @@ public class ItemController {
         return ResponseEntity.ok(JSONFormat.success(service.item(id), "Berhasil mengambil item"));
     }
 
+    @GetMapping("/api/items/available")
+    public ResponseEntity<?> availableItems(@RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(JSONFormat.success(PageUtil.response(service.availableItems(PageableUtil.from(page, size, Map.of()))), "Berhasil mengambil item available"));
+    }
+
+    @GetMapping("/api/items/{itemId}/available-item-status")
+    public ResponseEntity<?> availableItemStatus(@PathVariable Long itemId) {
+        return ResponseEntity.ok(JSONFormat.success(service.availableItemStatus(itemId), "Berhasil mengambil item status available"));
+    }
+
     @PostMapping(value = "/api/items", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createItem(@Valid @RequestBody ItemRequest body, HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
@@ -57,7 +68,7 @@ public class ItemController {
                                                  @RequestParam(value = "description", required = false) String description,
                                                  @RequestParam("daily_price") BigDecimal dailyPrice,
                                                  @RequestParam("stock") Integer stock,
-                                                 @RequestParam("status") String status,
+                                                 @RequestParam(value = "status", required = false) String status,
                                                  @RequestParam(value = "image_upload", required = false) MultipartFile imageUpload,
                                                  HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
@@ -81,8 +92,8 @@ public class ItemController {
                                                  @RequestParam(value = "serial_number", required = false) String serialNumber,
                                                  @RequestParam(value = "description", required = false) String description,
                                                  @RequestParam("daily_price") BigDecimal dailyPrice,
-                                                 @RequestParam("stock") Integer stock,
-                                                 @RequestParam("status") String status,
+                                                 @RequestParam(value = "stock", required = false) Integer stock,
+                                                 @RequestParam(value = "status", required = false) String status,
                                                  @RequestParam(value = "image_upload", required = false) MultipartFile imageUpload,
                                                  HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));

@@ -14,7 +14,4 @@ public class ReturnRequest {
     @NotNull
     private LocalDate returnDate;
     private String conditionNote;
-    @NotNull
-    private Boolean hasPenalty;
-    private Long penaltyPaymentMethodId;
 }

@@ -17,8 +17,11 @@ public class RentalPayment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rental_id", nullable = false)
+    @JoinColumn(name = "rental_id")
     private Rental rental;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "penalty_id")
+    private Penalty penalty;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_method_id", nullable = false)
     private PaymentMethod paymentMethod;

@@ -32,10 +32,10 @@ public class ReportController {
         return csv("returns.csv", reportService.returns(startDate, endDate));
     }
 
-    @GetMapping("/api/reports/denda.csv")
-    public ResponseEntity<String> denda(@RequestParam(name = "start_date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                        @RequestParam(name = "end_date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return csv("denda.csv", reportService.penalties(startDate, endDate));
+    @GetMapping("/api/reports/penalties.csv")
+    public ResponseEntity<String> penalties(@RequestParam(name = "start_date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                            @RequestParam(name = "end_date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return csv("penalties.csv", reportService.penalties(startDate, endDate));
     }
 
     @GetMapping("/api/reports/customers.csv")

@@ -10,6 +10,9 @@ Content-Type: application/json
   "password": "admin123"
 }
 
+### Get admins with pagination no auth
+GET {{baseUrl}}/api/admins?page=0&size=10
+
 ### Get admins with pagination
 GET {{baseUrl}}/api/admins?page=0&size=10
 Authorization: Bearer {{login_super_admin.response.body.data.token}}

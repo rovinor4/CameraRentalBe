@@ -176,22 +176,18 @@ class CameraRentalBeApplicationTests {
                 {
                   "rental_id": %d,
                   "return_date": "2026-05-25",
-                  "condition_note": "Smoke return",
-                  "has_penalty": false,
-                  "penalty_payment_method_id": null
+                  "condition_note": "Smoke return"
                 }
                 """.formatted(rentalId)));
         update(adminToken, "/api/returns/" + returnId, """
                 {
                   "rental_id": %d,
                   "return_date": "2026-05-25",
-                  "condition_note": "Smoke return updated",
-                  "has_penalty": true,
-                  "penalty_payment_method_id": %d
+                  "condition_note": "Smoke return updated"
                 }
-                """.formatted(rentalId, paymentMethodId));
+                """.formatted(rentalId));
 
-        Long penaltyId = idFrom(create(adminToken, "/api/denda", """
+        Long penaltyId = idFrom(create(adminToken, "/api/penalties", """
                 {
                   "return_id": %d,
                   "penalty_type": "other",
@@ -201,7 +197,7 @@ class CameraRentalBeApplicationTests {
                   "paid_at": null
                 }
                 """.formatted(returnId)));
-        update(adminToken, "/api/denda/" + penaltyId, """
+        update(adminToken, "/api/penalties/" + penaltyId, """
                 {
                   "return_id": %d,
                   "penalty_type": "other",
@@ -233,7 +229,7 @@ class CameraRentalBeApplicationTests {
                 }
                 """.formatted(itemId, suffix));
 
-        remove(adminToken, "/api/denda/" + penaltyId);
+        remove(adminToken, "/api/penalties/" + penaltyId);
         remove(adminToken, "/api/rental-payments/" + rentalPaymentId);
         remove(adminToken, "/api/returns/" + returnId);
         remove(superAdminToken, "/api/maintenance/" + maintenanceId);

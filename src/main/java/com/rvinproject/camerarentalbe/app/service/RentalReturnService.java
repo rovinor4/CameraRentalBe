@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class RentalReturnService {
     private final RentalReturnRepository rentalReturnRepository;
     private final RentalService rentalService;
-    private final PaymentMethodService paymentMethodService;
 
     public Page<RentalReturn> returns(Specification<RentalReturn> specification, Pageable pageable) {
         return rentalReturnRepository.findAll(specification, pageable);
@@ -44,12 +43,24 @@ public class RentalReturnService {
         rentalReturn.setAdmin(admin);
         rentalReturn.setReturnDate(request.getReturnDate());
         rentalReturn.setConditionNote(request.getConditionNote());
-        rentalReturn.setHasPenalty(request.getHasPenalty());
-        rentalReturn.setPenaltyPaymentMethod(request.getPenaltyPaymentMethodId() == null ? null : paymentMethodService.activePaymentMethod(request.getPenaltyPaymentMethodId()));
+        if (id == null || rentalReturn.getHasPenalty() == null) {
+            rentalReturn.setHasPenalty(false);
+        }
+        rentalReturn.setPenaltyPaymentMethod(null);
         rental.setActualReturnDate(request.getReturnDate());
         rental.setStatus(RentalStatus.returned);
         rentalService.restoreStock(rental);
         return rentalReturnRepository.save(rentalReturn);
+    }
+
+    @Transactional
+    public void setHasPenalty(Long id, boolean hasPenalty) {
+        RentalReturn rentalReturn = rentalReturn(id);
+        rentalReturn.setHasPenalty(hasPenalty);
+        if (!hasPenalty) {
+            rentalReturn.setPenaltyPaymentMethod(null);
+        }
+        rentalReturnRepository.save(rentalReturn);
     }
 
     public void deleteReturn(Long id) {

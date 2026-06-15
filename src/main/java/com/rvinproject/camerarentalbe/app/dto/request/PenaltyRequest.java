@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class PenaltyRequest {
-    @NotNull
     private Long returnId;
     @NotBlank
     private String penaltyType;

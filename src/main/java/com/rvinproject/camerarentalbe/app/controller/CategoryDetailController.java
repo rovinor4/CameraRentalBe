@@ -38,6 +38,37 @@ public class CategoryDetailController {
         return ResponseEntity.ok(JSONFormat.success(service.categoryDetail(id), "Berhasil mengambil category detail"));
     }
 
+    @GetMapping("/api/categories-detail/get/{categoryId}")
+    public ResponseEntity<?> categoryDetailsByCategory(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(JSONFormat.success(service.categoryDetailsByCategory(categoryId), "Berhasil mengambil category detail berdasarkan category"));
+    }
+
+    @PostMapping("/api/categories-detail/create/{categoryId}")
+    public ResponseEntity<?> createCategoryDetailByCategory(@PathVariable Long categoryId,
+                                                            @Valid @RequestBody CategoryDetailRequest body,
+                                                            HttpServletRequest request) {
+        AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
+        return ResponseEntity.ok(JSONFormat.success(service.saveCategoryDetail(null, categoryId, body), "Berhasil membuat category detail"));
+    }
+
+    @PutMapping("/api/categories-detail/update/{categoryId}/{categoryDetailId}")
+    public ResponseEntity<?> updateCategoryDetailByCategory(@PathVariable Long categoryId,
+                                                            @PathVariable Long categoryDetailId,
+                                                            @Valid @RequestBody CategoryDetailRequest body,
+                                                            HttpServletRequest request) {
+        AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
+        return ResponseEntity.ok(JSONFormat.success(service.updateCategoryDetailByCategory(categoryId, categoryDetailId, body), "Berhasil mengubah category detail"));
+    }
+
+    @DeleteMapping("/api/categories-detail/delete/{categoryId}/{categoryDetailId}")
+    public ResponseEntity<?> deleteCategoryDetailByCategory(@PathVariable Long categoryId,
+                                                            @PathVariable Long categoryDetailId,
+                                                            HttpServletRequest request) {
+        AuthUtil.requireSuperAdmin(AuthUtil.admin(request));
+        service.deleteCategoryDetailByCategory(categoryId, categoryDetailId);
+        return ResponseEntity.ok(JSONFormat.success(null, "Berhasil menghapus category detail"));
+    }
+
     @PostMapping("/api/category-details")
     public ResponseEntity<?> createCategoryDetail(@Valid @RequestBody CategoryDetailRequest body, HttpServletRequest request) {
         AuthUtil.requireSuperAdmin(AuthUtil.admin(request));

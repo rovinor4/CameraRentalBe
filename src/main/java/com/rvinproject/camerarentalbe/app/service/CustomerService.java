@@ -37,6 +37,7 @@ public class CustomerService {
         customer.setIdentityType(ValidationUtil.enumValue(request.getIdentityType(), IdentityType.class, "identity_type"));
         customer.setIdentityNumber(request.getIdentityNumber());
         String uploadedIdentityImage = fileStorageService.storeImage(request.getIdentityImageUpload(), "customers");
+
         if (uploadedIdentityImage == null && id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "identity_image_upload wajib diisi");
         }

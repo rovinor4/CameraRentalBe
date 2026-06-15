@@ -4,8 +4,8 @@ import com.rvinproject.camerarentalbe.app.dto.request.MaintenanceRequest;
 import com.rvinproject.camerarentalbe.app.enumModel.ItemStatus;
 import com.rvinproject.camerarentalbe.app.enumModel.MaintenanceStatus;
 import com.rvinproject.camerarentalbe.app.model.Admin;
-import com.rvinproject.camerarentalbe.app.model.Item;
 import com.rvinproject.camerarentalbe.app.model.ItemMaintenance;
+import com.rvinproject.camerarentalbe.app.model.ItemStatusRecord;
 import com.rvinproject.camerarentalbe.app.repository.ItemMaintenanceRepository;
 import com.rvinproject.camerarentalbe.app.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class ItemMaintenanceService {
     private final ItemMaintenanceRepository itemMaintenanceRepository;
-    private final ItemService itemService;
+    private final ItemStatusService itemStatusService;
 
     public Page<ItemMaintenance> maintenances(Specification<ItemMaintenance> specification, Pageable pageable) {
         return itemMaintenanceRepository.findAll(specification, pageable);
@@ -34,18 +34,18 @@ public class ItemMaintenanceService {
     @Transactional
     public ItemMaintenance saveMaintenance(Long id, MaintenanceRequest request, Admin admin) {
         ItemMaintenance maintenance = id == null ? new ItemMaintenance() : maintenance(id);
-        Item item = itemService.item(request.getItemId());
+        ItemStatusRecord itemStatus = request.getItemStatusId() == null
+                ? itemStatusService.availableItemStatus(request.getItemId())
+                : itemStatusService.itemStatus(request.getItemStatusId());
         MaintenanceStatus status = ValidationUtil.enumValue(request.getStatus(), MaintenanceStatus.class, "status");
-        maintenance.setItem(item);
+        maintenance.setItemStatus(itemStatus);
         maintenance.setAdmin(admin);
         maintenance.setTitle(request.getTitle());
         maintenance.setDescription(request.getDescription());
         maintenance.setMaintenanceDate(request.getMaintenanceDate());
         maintenance.setCost(request.getCost());
         maintenance.setStatus(status);
-        item.setStatus(MaintenanceStatus.in_progress.equals(status)
-                ? ItemStatus.maintenance
-                : (item.getStock() > 0 ? ItemStatus.available : ItemStatus.inactive));
+        itemStatus.setStatus(MaintenanceStatus.in_progress.equals(status) ? ItemStatus.maintenance : ItemStatus.available);
         return itemMaintenanceRepository.save(maintenance);
     }
 

@@ -23,14 +23,29 @@ VALUES
     ((SELECT id FROM categories WHERE name = 'Accessory'), 'Stabilizer', 'Stabilizer dan gimbal'),
     ((SELECT id FROM categories WHERE name = 'Accessory'), 'Tripod', 'Tripod dan support kamera');
 
-INSERT INTO items (category_id, category_detail_id, name, brand, model, serial_number, description, daily_price, stock, status, image)
+INSERT INTO items (category_id, category_detail_id, name, brand, model, serial_number, description, daily_price, stock, image)
 VALUES
-    ((SELECT id FROM categories WHERE name = 'Camera'), (SELECT id FROM category_details WHERE name = 'Mirrorless'), 'Sony A7 III', 'Sony', 'A7 III', 'SONY-A7III-001', 'Full-frame mirrorless camera', 250000.00, 2, 'available', 'storage/items/sony-a7iii.jpg'),
-    ((SELECT id FROM categories WHERE name = 'Camera'), (SELECT id FROM category_details WHERE name = 'Mirrorless'), 'Canon EOS R6', 'Canon', 'EOS R6', 'CANON-R6-001', 'Mirrorless camera untuk foto dan video', 300000.00, 1, 'available', 'storage/items/canon-r6.jpg'),
-    ((SELECT id FROM categories WHERE name = 'Lens'), (SELECT id FROM category_details WHERE name = 'Prime Lens'), 'Canon RF 50mm f1.8', 'Canon', 'RF 50mm f1.8', 'CANON-RF50-001', 'Prime lens portrait', 85000.00, 3, 'available', 'storage/items/canon-rf50.jpg'),
-    ((SELECT id FROM categories WHERE name = 'Lens'), (SELECT id FROM category_details WHERE name = 'Zoom Lens'), 'Sony FE 24-70mm f2.8 GM', 'Sony', 'FE 24-70 GM', 'SONY-2470GM-001', 'Zoom lens profesional', 175000.00, 1, 'available', 'storage/items/sony-2470gm.jpg'),
-    ((SELECT id FROM categories WHERE name = 'Accessory'), (SELECT id FROM category_details WHERE name = 'Stabilizer'), 'DJI RS 3 Mini', 'DJI', 'RS 3 Mini', 'DJI-RS3M-001', 'Stabilizer kamera mirrorless', 125000.00, 1, 'maintenance', 'storage/items/dji-rs3-mini.jpg'),
-    ((SELECT id FROM categories WHERE name = 'Accessory'), (SELECT id FROM category_details WHERE name = 'Tripod'), 'Manfrotto Compact Action', 'Manfrotto', 'Compact Action', 'MANFROTTO-CA-001', 'Tripod compact untuk kamera', 50000.00, 4, 'available', 'storage/items/manfrotto-compact.jpg');
+    ((SELECT id FROM categories WHERE name = 'Camera'), (SELECT id FROM category_details WHERE name = 'Mirrorless'), 'Sony A7 III', 'Sony', 'A7 III', 'SONY-A7III-001', 'Full-frame mirrorless camera', 250000.00, 2, 'storage/items/sony-a7iii.jpg'),
+    ((SELECT id FROM categories WHERE name = 'Camera'), (SELECT id FROM category_details WHERE name = 'Mirrorless'), 'Canon EOS R6', 'Canon', 'EOS R6', 'CANON-R6-001', 'Mirrorless camera untuk foto dan video', 300000.00, 1, 'storage/items/canon-r6.jpg'),
+    ((SELECT id FROM categories WHERE name = 'Lens'), (SELECT id FROM category_details WHERE name = 'Prime Lens'), 'Canon RF 50mm f1.8', 'Canon', 'RF 50mm f1.8', 'CANON-RF50-001', 'Prime lens portrait', 85000.00, 3, 'storage/items/canon-rf50.jpg'),
+    ((SELECT id FROM categories WHERE name = 'Lens'), (SELECT id FROM category_details WHERE name = 'Zoom Lens'), 'Sony FE 24-70mm f2.8 GM', 'Sony', 'FE 24-70 GM', 'SONY-2470GM-001', 'Zoom lens profesional', 175000.00, 1, 'storage/items/sony-2470gm.jpg'),
+    ((SELECT id FROM categories WHERE name = 'Accessory'), (SELECT id FROM category_details WHERE name = 'Stabilizer'), 'DJI RS 3 Mini', 'DJI', 'RS 3 Mini', 'DJI-RS3M-001', 'Stabilizer kamera mirrorless', 125000.00, 1, 'storage/items/dji-rs3-mini.jpg'),
+    ((SELECT id FROM categories WHERE name = 'Accessory'), (SELECT id FROM category_details WHERE name = 'Tripod'), 'Manfrotto Compact Action', 'Manfrotto', 'Compact Action', 'MANFROTTO-CA-001', 'Tripod compact untuk kamera', 50000.00, 4, 'storage/items/manfrotto-compact.jpg');
+
+INSERT INTO item_statuses (item_id, status)
+VALUES
+    ((SELECT id FROM items WHERE serial_number = 'SONY-A7III-001'), 'rented'),
+    ((SELECT id FROM items WHERE serial_number = 'SONY-A7III-001'), 'available'),
+    ((SELECT id FROM items WHERE serial_number = 'CANON-R6-001'), 'available'),
+    ((SELECT id FROM items WHERE serial_number = 'CANON-RF50-001'), 'available'),
+    ((SELECT id FROM items WHERE serial_number = 'CANON-RF50-001'), 'available'),
+    ((SELECT id FROM items WHERE serial_number = 'CANON-RF50-001'), 'available'),
+    ((SELECT id FROM items WHERE serial_number = 'SONY-2470GM-001'), 'available'),
+    ((SELECT id FROM items WHERE serial_number = 'DJI-RS3M-001'), 'maintenance'),
+    ((SELECT id FROM items WHERE serial_number = 'MANFROTTO-CA-001'), 'rented'),
+    ((SELECT id FROM items WHERE serial_number = 'MANFROTTO-CA-001'), 'rented'),
+    ((SELECT id FROM items WHERE serial_number = 'MANFROTTO-CA-001'), 'available'),
+    ((SELECT id FROM items WHERE serial_number = 'MANFROTTO-CA-001'), 'available');
 
 INSERT INTO payment_methods (name, type, content_type, content_value, image_upload, is_active)
 VALUES
@@ -44,12 +59,13 @@ VALUES
     ((SELECT id FROM customers WHERE identity_number = '3173010101900001'), (SELECT id FROM admins WHERE email = 'rental@camera-rental.test'), 'RNT-DEMO-001', '2026-05-18', '2026-05-21', NULL, 850000.00, 'ongoing', 'Sewa untuk dokumentasi event kantor'),
     ((SELECT id FROM customers WHERE identity_number = '3273014402920002'), (SELECT id FROM admins WHERE email = 'rental@camera-rental.test'), 'RNT-DEMO-002', '2026-05-10', '2026-05-12', '2026-05-12', 770000.00, 'returned', 'Sewa untuk prewedding');
 
-INSERT INTO rental_details (rental_id, item_id, daily_price, quantity, subtotal)
+INSERT INTO rental_details (rental_id, item_status_id, daily_price, quantity, subtotal)
 VALUES
-    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-001'), (SELECT id FROM items WHERE serial_number = 'SONY-A7III-001'), 250000.00, 1, 750000.00),
-    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-001'), (SELECT id FROM items WHERE serial_number = 'MANFROTTO-CA-001'), 50000.00, 2, 100000.00),
-    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-002'), (SELECT id FROM items WHERE serial_number = 'CANON-R6-001'), 300000.00, 1, 600000.00),
-    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-002'), (SELECT id FROM items WHERE serial_number = 'CANON-RF50-001'), 85000.00, 1, 170000.00);
+    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-001'), (SELECT MIN(id) FROM item_statuses WHERE item_id = (SELECT id FROM items WHERE serial_number = 'SONY-A7III-001') AND status = 'rented'), 250000.00, 1, 750000.00),
+    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-001'), (SELECT MIN(id) FROM item_statuses WHERE item_id = (SELECT id FROM items WHERE serial_number = 'MANFROTTO-CA-001') AND status = 'rented'), 50000.00, 1, 50000.00),
+    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-001'), (SELECT MAX(id) FROM item_statuses WHERE item_id = (SELECT id FROM items WHERE serial_number = 'MANFROTTO-CA-001') AND status = 'rented'), 50000.00, 1, 50000.00),
+    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-002'), (SELECT id FROM item_statuses WHERE item_id = (SELECT id FROM items WHERE serial_number = 'CANON-R6-001') LIMIT 1), 300000.00, 1, 600000.00),
+    ((SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-002'), (SELECT MIN(id) FROM item_statuses WHERE item_id = (SELECT id FROM items WHERE serial_number = 'CANON-RF50-001')), 85000.00, 1, 170000.00);
 
 INSERT INTO rental_payments (rental_id, payment_method_id, payment_code, amount, payment_date, status, proof_image)
 VALUES
@@ -65,6 +81,6 @@ INSERT INTO penalties (return_id, penalty_type, description, amount, status, pai
 VALUES
     ((SELECT id FROM returns WHERE rental_id = (SELECT id FROM rentals WHERE rental_code = 'RNT-DEMO-002')), 'damage', 'Gores kecil pada body kamera', 50000.00, 'paid', '2026-05-12 17:00:00');
 
-INSERT INTO item_maintenance (item_id, admin_id, title, description, maintenance_date, cost, status)
+INSERT INTO item_maintenance (item_status_id, admin_id, title, description, maintenance_date, cost, status)
 VALUES
-    ((SELECT id FROM items WHERE serial_number = 'DJI-RS3M-001'), (SELECT id FROM admins WHERE email = 'rental@camera-rental.test'), 'Kalibrasi gimbal', 'Kalibrasi motor dan pengecekan baterai', '2026-05-20', 150000.00, 'in_progress');
+    ((SELECT id FROM item_statuses WHERE item_id = (SELECT id FROM items WHERE serial_number = 'DJI-RS3M-001')), (SELECT id FROM admins WHERE email = 'rental@camera-rental.test'), 'Kalibrasi gimbal', 'Kalibrasi motor dan pengecekan baterai', '2026-05-20', 150000.00, 'in_progress');

@@ -12,7 +12,15 @@ Content-Type: application/json
 }
 
 ### List items
-GET {{baseUrl}}/api/items?page=0&size=10&search=Sony&status=available&sort=name&direction=asc
+GET {{baseUrl}}/api/items?page=0&size=10&search=Sony&sort=name&direction=asc
+Authorization: Bearer {{token}}
+
+### List available items
+GET {{baseUrl}}/api/items/available?page=0&size=10
+Authorization: Bearer {{token}}
+
+### Get one available item status for item
+GET {{baseUrl}}/api/items/3/available-item-status
 Authorization: Bearer {{token}}
 
 ### Detail item
@@ -61,10 +69,6 @@ Content-Disposition: form-data; name="stock"
 
 2
 --ItemCreateBoundary
-Content-Disposition: form-data; name="status"
-
-available
---ItemCreateBoundary
 Content-Disposition: form-data; name="image_upload"; filename="item.jpg"
 Content-Type: image/jpeg
 
@@ -108,14 +112,6 @@ Full-frame mirrorless camera updated
 Content-Disposition: form-data; name="daily_price"
 
 255000
---ItemUpdateBoundary
-Content-Disposition: form-data; name="stock"
-
-2
---ItemUpdateBoundary
-Content-Disposition: form-data; name="status"
-
-available
 --ItemUpdateBoundary
 Content-Disposition: form-data; name="image_upload"; filename="item-update.jpg"
 Content-Type: image/jpeg

@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class MaintenanceRequest {
-    @NotNull
     private Long itemId;
+    private Long itemStatusId;
     @NotBlank
     private String title;
     private String description;

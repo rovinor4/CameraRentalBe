@@ -22,6 +22,11 @@ public class StorageController {
         return response(fileStorageService.resource("public/" + filename));
     }
 
+    @GetMapping("/storage/customers/{filename:.+}")
+    public ResponseEntity<Resource> customerFile(@PathVariable String filename) throws IOException {
+        return response(fileStorageService.resource("customers/" + filename));
+    }
+
     @GetMapping("/storage/payment-methods/{filename:.+}")
     public ResponseEntity<Resource> paymentMethodFile(@PathVariable String filename) throws IOException {
         return response(fileStorageService.resource("payment-methods/" + filename));

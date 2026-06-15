@@ -67,8 +67,16 @@ entity items {
   description : text
   daily_price : decimal
   stock : int
-  status : varchar
   image : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity item_statuses {
+  * id : bigint
+  --
+  item_id : bigint
+  status : varchar
   created_at : timestamp
   updated_at : timestamp
 }
@@ -106,7 +114,7 @@ entity rental_details {
   * id : bigint
   --
   rental_id : bigint
-  item_id : bigint
+  item_status_id : bigint
   daily_price : decimal
   quantity : int
   subtotal : decimal
@@ -157,7 +165,7 @@ entity penalties {
 entity item_maintenance {
   * id : bigint
   --
-  item_id : bigint
+  item_status_id : bigint
   admin_id : bigint
   title : varchar
   description : text
@@ -180,7 +188,8 @@ categories ||--o{ items : groups
 category_details ||--o{ items : classifies
 
 rentals ||--o{ rental_details : has
-items ||--o{ rental_details : rented_in
+items ||--o{ item_statuses : has_units
+item_statuses ||--o{ rental_details : rented_in
 
 rentals ||--o{ rental_payments : paid_by
 payment_methods ||--o{ rental_payments : used_by
@@ -189,6 +198,6 @@ rentals ||--o| returns : returned_as
 returns ||--o| penalties : has
 payment_methods ||--o{ returns : used_for_penalty
 
-items ||--o{ item_maintenance : maintained_in
+item_statuses ||--o{ item_maintenance : maintained_in
 
 @enduml

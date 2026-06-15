@@ -18,6 +18,7 @@ package "Controller" {
   class CategoryController <<Controller>>
   class CategoryDetailController <<Controller>>
   class ItemController <<Controller>>
+  class ItemStatusController <<Controller>>
   class PaymentMethodController <<Controller>>
   class StorageController <<Controller>>
   class RentalController <<Controller>>
@@ -41,6 +42,7 @@ package "DTO Request" {
   class CategoryRequest <<DTO>>
   class CategoryDetailRequest <<DTO>>
   class ItemRequest <<DTO>>
+  class ItemStatusRequest <<DTO>>
   class PaymentMethodRequest <<DTO>>
   class RentalRequest <<DTO>>
   class RentalDetailRequest <<DTO>>
@@ -56,6 +58,7 @@ package "Service" {
   class CategoryService <<Service>>
   class CategoryDetailService <<Service>>
   class ItemService <<Service>>
+  class ItemStatusService <<Service>>
   class PaymentMethodService <<Service>>
   class FileStorageService <<Service>>
   class RentalService <<Service>>
@@ -73,6 +76,7 @@ package "Repository" {
   interface CategoryRepository <<Repository>>
   interface CategoryDetailRepository <<Repository>>
   interface ItemRepository <<Repository>>
+  interface ItemStatusRepository <<Repository>>
   interface PaymentMethodRepository <<Repository>>
   interface RentalRepository <<Repository>>
   interface RentalDetailRepository <<Repository>>
@@ -114,8 +118,15 @@ package "Model" {
     name
     dailyPrice
     stock
-    status: ItemStatus
+    availableCount
+    rentedCount
+    maintenanceCount
+    inactiveCount
     image
+  }
+  class ItemStatusRecord <<Entity>> {
+    id
+    status: ItemStatus
   }
   class PaymentMethod <<Entity>> {
     id
@@ -253,6 +264,9 @@ CategoryDetailController --> JSONFormat
 ItemController --> ItemRequest
 ItemController --> ItemService
 ItemController --> JSONFormat
+ItemStatusController --> ItemStatusRequest
+ItemStatusController --> ItemStatusService
+ItemStatusController --> JSONFormat
 PaymentMethodController --> PaymentMethodRequest
 PaymentMethodController --> PaymentMethodService
 PaymentMethodController --> JSONFormat
@@ -283,14 +297,19 @@ CategoryService --> CategoryRepository
 CategoryDetailService --> CategoryDetailRepository
 CategoryDetailService --> CategoryService
 ItemService --> ItemRepository
+ItemService --> ItemStatusService
 ItemService --> CategoryService
 ItemService --> CategoryDetailService
 ItemService --> FileStorageService
+ItemStatusService --> ItemStatusRepository
+ItemStatusService --> ItemRepository
 PaymentMethodService --> PaymentMethodRepository
 PaymentMethodService --> FileStorageService
 RentalService --> RentalRepository
 RentalService --> CustomerRepository
 RentalService --> ItemRepository
+RentalService --> ItemStatusService
+RentalService --> RentalDetailRepository
 RentalService --> StringHelper
 RentalPaymentService --> RentalPaymentRepository
 RentalPaymentService --> RentalService
@@ -302,7 +321,7 @@ RentalReturnService --> PaymentMethodService
 PenaltyService --> PenaltyRepository
 PenaltyService --> RentalReturnService
 ItemMaintenanceService --> ItemMaintenanceRepository
-ItemMaintenanceService --> ItemService
+ItemMaintenanceService --> ItemStatusService
 ReportService --> RentalRepository
 ReportService --> PenaltyRepository
 ReportService --> CustomerRepository
@@ -315,6 +334,7 @@ CustomerRepository --> Customer
 CategoryRepository --> Category
 CategoryDetailRepository --> CategoryDetail
 ItemRepository --> Item
+ItemStatusRepository --> ItemStatusRecord
 PaymentMethodRepository --> PaymentMethod
 RentalRepository --> Rental
 RentalDetailRepository --> RentalDetail
@@ -327,22 +347,23 @@ Admin "1" -- "0..*" AdminSession
 Category "1" -- "0..*" CategoryDetail
 Category "1" -- "0..*" Item
 CategoryDetail "0..1" -- "0..*" Item
+Item "1" -- "0..*" ItemStatusRecord
 Customer "1" -- "0..*" Rental
 Admin "1" -- "0..*" Rental
 Rental "1" -- "1..*" RentalDetail
-Item "1" -- "0..*" RentalDetail
+ItemStatusRecord "1" -- "0..*" RentalDetail
 Rental "1" -- "0..*" RentalPayment
 PaymentMethod "1" -- "0..*" RentalPayment
 Rental "1" -- "0..1" RentalReturn
 Admin "1" -- "0..*" RentalReturn
 PaymentMethod "0..1" -- "0..*" RentalReturn
 RentalReturn "1" -- "0..*" Penalty
-Item "1" -- "0..*" ItemMaintenance
+ItemStatusRecord "1" -- "0..*" ItemMaintenance
 Admin "1" -- "0..*" ItemMaintenance
 
 Admin --> AdminRole
 Customer --> IdentityType
-Item --> ItemStatus
+ItemStatusRecord --> ItemStatus
 PaymentMethod --> PaymentMethodType
 PaymentMethod --> PaymentContentType
 Rental --> RentalStatus
@@ -357,6 +378,7 @@ CustomerController --> AuthUtil
 CategoryController --> AuthUtil
 CategoryDetailController --> AuthUtil
 ItemController --> AuthUtil
+ItemStatusController --> AuthUtil
 PaymentMethodController --> AuthUtil
 RentalController --> AuthUtil
 RentalReturnController --> AuthUtil
@@ -367,6 +389,7 @@ CustomerController --> PageableUtil
 CategoryController --> PageableUtil
 CategoryDetailController --> PageableUtil
 ItemController --> PageableUtil
+ItemStatusController --> PageableUtil
 PaymentMethodController --> PageableUtil
 RentalController --> PageableUtil
 RentalPaymentController --> PageableUtil
@@ -376,7 +399,7 @@ ItemMaintenanceController --> PageableUtil
 
 AdminAuthService --> ValidationUtil
 CustomerService --> ValidationUtil
-ItemService --> ValidationUtil
+ItemStatusService --> ValidationUtil
 PaymentMethodService --> ValidationUtil
 RentalService --> ValidationUtil
 RentalPaymentService --> ValidationUtil

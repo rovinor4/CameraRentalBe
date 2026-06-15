@@ -1,0 +1,42 @@
+@baseUrl = http://localhost:8080
+@token = {{login_super_admin.response.body.data.token}}
+
+### Login super admin
+# @name login_super_admin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@camera-rental.test",
+  "password": "admin123"
+}
+
+### List item statuses
+GET {{baseUrl}}/api/item-statuses?page=0&size=10&status=available
+Authorization: Bearer {{token}}
+
+### Detail item status
+GET {{baseUrl}}/api/item-statuses/1
+Authorization: Bearer {{token}}
+
+### Create item status for stock addition
+POST {{baseUrl}}/api/items/3/item-statuses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "available"
+}
+
+### Update item status
+PATCH {{baseUrl}}/api/item-statuses/7
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "inactive"
+}
+
+### Delete item status for stock reduction
+DELETE {{baseUrl}}/api/item-statuses/12
+Authorization: Bearer {{token}}

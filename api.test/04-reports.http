@@ -28,8 +28,8 @@ Authorization: Bearer {{login_admin.response.body.data.token}}
 GET {{baseUrl}}/api/reports/returns.csv?start_date=2026-05-01&end_date=2026-05-31
 Authorization: Bearer {{login_admin.response.body.data.token}}
 
-### Report denda CSV
-GET {{baseUrl}}/api/reports/denda.csv?start_date=2026-05-01&end_date=2026-05-31
+### Report penalties CSV
+GET {{baseUrl}}/api/reports/penalties.csv?start_date=2026-05-01&end_date=2026-05-31
 Authorization: Bearer {{login_admin.response.body.data.token}}
 
 ### Report customers CSV
@@ -44,3 +44,6 @@ Authorization: Bearer {{login_super_admin.response.body.data.token}}
 GET {{baseUrl}}/api/reports/payments.csv?start_date=2026-05-01&end_date=2026-05-31
 Authorization: Bearer {{login_super_admin.response.body.data.token}}
 
+### Dashboard summary
+GET {{baseUrl}}/api/dashboard
+Authorization: Bearer {{login_admin.response.body.data.token}}

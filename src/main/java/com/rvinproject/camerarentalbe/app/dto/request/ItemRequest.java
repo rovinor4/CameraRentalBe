@@ -26,10 +26,8 @@ public class ItemRequest {
     @NotNull
     @DecimalMin("0.0")
     private BigDecimal dailyPrice;
-    @NotNull
     @Min(0)
     private Integer stock;
-    @NotBlank
     private String status;
     private String image;
     @JsonIgnore

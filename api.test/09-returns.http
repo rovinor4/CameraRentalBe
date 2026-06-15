@@ -26,9 +26,7 @@ Content-Type: application/json
 {
   "rental_id": 1,
   "return_date": "2026-05-24",
-  "condition_note": "Semua barang kembali lengkap",
-  "has_penalty": false,
-  "penalty_payment_method_id": null
+  "condition_note": "Semua barang kembali lengkap"
 }
 
 ### Update return
@@ -39,9 +37,7 @@ Content-Type: application/json
 {
   "rental_id": 2,
   "return_date": "2026-05-12",
-  "condition_note": "Barang kembali lengkap, ada gores kecil pada body kamera",
-  "has_penalty": true,
-  "penalty_payment_method_id": 1
+  "condition_note": "Barang kembali lengkap, ada gores kecil pada body kamera"
 }
 
 ### Delete return

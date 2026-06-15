@@ -18,6 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.time.temporal.ChronoUnit;
 
 @Service
@@ -26,6 +30,8 @@ public class RentalService {
     private final RentalRepository rentalRepository;
     private final CustomerRepository customerRepository;
     private final ItemRepository itemRepository;
+    private final ItemStatusService itemStatusService;
+    private final RentalDetailRepository rentalDetailRepository;
 
     public Page<Rental> rentals(Specification<Rental> specification, Pageable pageable) {
         return rentalRepository.findAll(specification, pageable);
@@ -33,6 +39,10 @@ public class RentalService {
 
     public Rental rental(Long id) {
         return rentalRepository.findById(id).orElseThrow(() -> notFound("rental"));
+    }
+
+    public List<Rental> rentalNotReturned() {
+        return rentalRepository.findByStatus(RentalStatus.ongoing);
     }
 
     @Transactional
@@ -51,19 +61,8 @@ public class RentalService {
 
         long days = Math.max(1, ChronoUnit.DAYS.between(request.getRentalDate(), request.getPlannedReturnDate()));
         BigDecimal total = BigDecimal.ZERO;
-        for (RentalDetailRequest detailRequest : request.getDetails()) {
-            Item item = item(detailRequest.getItemId());
-            validateRentableItem(item, detailRequest.getQuantity());
-            item.setStock(item.getStock() - detailRequest.getQuantity());
-            if (item.getStock() == 0) {
-                item.setStatus(ItemStatus.rented);
-            }
-            RentalDetail detail = new RentalDetail();
-            detail.setRental(rental);
-            detail.setItem(item);
-            detail.setDailyPrice(item.getDailyPrice());
-            detail.setQuantity(detailRequest.getQuantity());
-            detail.setSubtotal(item.getDailyPrice().multiply(BigDecimal.valueOf(detailRequest.getQuantity())).multiply(BigDecimal.valueOf(days)));
+        for (ItemStatusRecord itemStatus : requestedItemStatuses(request.getDetails())) {
+            RentalDetail detail = buildDetail(rental, itemStatus, days);
             rental.getDetails().add(detail);
             total = total.add(detail.getSubtotal());
         }
@@ -90,19 +89,8 @@ public class RentalService {
 
         long days = Math.max(1, ChronoUnit.DAYS.between(request.getRentalDate(), request.getPlannedReturnDate()));
         BigDecimal total = BigDecimal.ZERO;
-        for (RentalDetailRequest detailRequest : request.getDetails()) {
-            Item item = item(detailRequest.getItemId());
-            validateRentableItem(item, detailRequest.getQuantity());
-            item.setStock(item.getStock() - detailRequest.getQuantity());
-            if (item.getStock() == 0) {
-                item.setStatus(ItemStatus.rented);
-            }
-            RentalDetail detail = new RentalDetail();
-            detail.setRental(rental);
-            detail.setItem(item);
-            detail.setDailyPrice(item.getDailyPrice());
-            detail.setQuantity(detailRequest.getQuantity());
-            detail.setSubtotal(item.getDailyPrice().multiply(BigDecimal.valueOf(detailRequest.getQuantity())).multiply(BigDecimal.valueOf(days)));
+        for (ItemStatusRecord itemStatus : requestedItemStatuses(request.getDetails())) {
+            RentalDetail detail = buildDetail(rental, itemStatus, days);
             rental.getDetails().add(detail);
             total = total.add(detail.getSubtotal());
         }
@@ -119,6 +107,17 @@ public class RentalService {
         rentalRepository.delete(rental);
     }
 
+    @Transactional
+    public void deleteRentalDetail(Long id) {
+        RentalDetail detail = rentalDetailRepository.findById(id).orElseThrow(() -> notFound("rental detail"));
+        Rental rental = detail.getRental();
+        detail.getItemStatus().setStatus(ItemStatus.available);
+        rental.getDetails().remove(detail);
+        rentalDetailRepository.delete(detail);
+        recalculateRentalTotal(rental);
+        rentalRepository.save(rental);
+    }
+
     private void validateRentalRequest(RentalRequest request) {
         if (request.getStatus() != null && !request.getStatus().isBlank()) {
             ValidationUtil.enumValue(request.getStatus(), RentalStatus.class, "status");
@@ -128,23 +127,64 @@ public class RentalService {
         }
     }
 
-    private void validateRentableItem(Item item, Integer quantity) {
-        if (!ItemStatus.available.equals(item.getStatus()) && !ItemStatus.rented.equals(item.getStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "item tidak tersedia: " + item.getName());
+    private List<ItemStatusRecord> requestedItemStatuses(List<RentalDetailRequest> detailRequests) {
+        List<ItemStatusRecord> itemStatuses = new ArrayList<>();
+        Set<Long> selectedIds = new HashSet<>();
+        for (RentalDetailRequest detailRequest : detailRequests) {
+            if (detailRequest.getItemStatusId() != null) {
+                ItemStatusRecord itemStatus = itemStatusService.itemStatus(detailRequest.getItemStatusId());
+                if (!selectedIds.add(itemStatus.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "item status tidak boleh duplikat: " + itemStatus.getId());
+                }
+                validateRentableItemStatus(itemStatus);
+                itemStatuses.add(itemStatus);
+                continue;
+            }
+            if (detailRequest.getItemId() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "item_status_id wajib diisi");
+            }
+            int quantity = detailRequest.getQuantity() == null ? 1 : detailRequest.getQuantity();
+            item(detailRequest.getItemId());
+            List<ItemStatusRecord> availableStatuses = itemStatusService.availableItemStatuses(detailRequest.getItemId(), quantity);
+            for (ItemStatusRecord itemStatus : availableStatuses) {
+                if (!selectedIds.add(itemStatus.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "item status tidak boleh duplikat: " + itemStatus.getId());
+                }
+            }
+            itemStatuses.addAll(availableStatuses);
         }
-        if (item.getStock() < quantity) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "stok item tidak cukup: " + item.getName());
+        return itemStatuses;
+    }
+
+    private void validateRentableItemStatus(ItemStatusRecord itemStatus) {
+        if (!ItemStatus.available.equals(itemStatus.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "item status tidak tersedia: " + itemStatus.getId());
         }
     }
 
     public void restoreStock(Rental rental) {
         for (RentalDetail detail : rental.getDetails()) {
-            Item item = detail.getItem();
-            item.setStock(item.getStock() + detail.getQuantity());
-            if (!ItemStatus.maintenance.equals(item.getStatus()) && !ItemStatus.inactive.equals(item.getStatus())) {
-                item.setStatus(ItemStatus.available);
-            }
+            detail.getItemStatus().setStatus(ItemStatus.available);
         }
+    }
+
+    private RentalDetail buildDetail(Rental rental, ItemStatusRecord itemStatus, long days) {
+        Item item = itemStatus.getItem();
+        itemStatus.setStatus(ItemStatus.rented);
+        RentalDetail detail = new RentalDetail();
+        detail.setRental(rental);
+        detail.setItemStatus(itemStatus);
+        detail.setDailyPrice(item.getDailyPrice());
+        detail.setQuantity(1);
+        detail.setSubtotal(item.getDailyPrice().multiply(BigDecimal.valueOf(days)));
+        return detail;
+    }
+
+    private void recalculateRentalTotal(Rental rental) {
+        BigDecimal total = rental.getDetails().stream()
+                .map(RentalDetail::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        rental.setTotalPrice(total);
     }
 
     private Customer customer(Long id) {
